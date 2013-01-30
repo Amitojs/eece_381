@@ -245,7 +245,7 @@ int draw_frogger(){
 			case 3: return 0;
 		}
 	}
-	alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x, frog_y, frog_x+20, frog_y+24, 0xF000, 1);
+	alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x, frog_y, frog_x+20, frog_y+23, 0xF000, 1);
 	return 0;
 }
 
@@ -281,6 +281,8 @@ int mainrun(){
 		if(movement_matrix[frog_y/24][frog_x/20] == 1){
 			//alt_up_pixel_buffer_dma_clear_screen(pixel_buffer, 0);
 			alt_up_char_buffer_string(char_buffer, "There Was A Collision", 30, 30);
+			frog_x = 120;
+			frog_y = 216;
 			return 0;
 		}
 //FINISH - Collision
@@ -485,7 +487,8 @@ int main(){
 	initilize_vga();
 	for(;;) {
 		menu();
-
+		frog_x = 120;
+		frog_y = 216;
 		// Clean up: put global variables back to starting values
 		// or else we restart the game dead
 	}
