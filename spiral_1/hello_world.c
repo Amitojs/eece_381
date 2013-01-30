@@ -19,6 +19,9 @@
 //Change to your QSYS local name
 #define YOUR_CHAR_BUFFER_NAME 	"/dev/char_drawer"
 
+//Directions
+typedef enum { up, down, left, right, nodir, dpause } dir;
+
 //------------------------------------------------------//
 
 
@@ -50,6 +53,9 @@ typedef enum { NoBlock, Grass, Water, Highway, WinBlock } background;
 	int movement_matrix[10][16];
 	int time_var1 = 150;
 	background g[10][16];
+    dir lastdir;
+	int frog_x = 120;
+	int frog_y = 216;
 
 //------------------------------------------------------//
 
@@ -185,6 +191,48 @@ void setup_level(){
 	}
 }
 
+int swfinder(){
+	return IORD_8DIRECT(YOUR_SWITCHES_ADDR, 0);
+}
+
+dir getdir(){
+	if 		 (swfinder() == 0){
+		lastdir = nodir;
+		return nodir;
+	}else if (swfinder() == 1 && lastdir == nodir){
+		lastdir = down;
+		return down;
+	}else if (swfinder() == 2 && lastdir == nodir){
+		lastdir = up;
+		return up;
+	}else if (swfinder() == 4 && lastdir == nodir){
+		lastdir = right;
+		return right;
+	}else if (swfinder() == 8 && lastdir == nodir){
+		lastdir = left;
+		return left;
+	}else if (swfinder() == 16){
+		lastdir = dpause;
+		return dpause;
+	}else{
+		return nodir;
+	}
+}
+
+void draw_frogger(){
+	dir mydir = getdir();
+	if(mydir == up){
+		frog_y = frog_y-24;
+	}else if(mydir == down){
+		frog_y = frog_y+24;
+	}else if(mydir == right){
+		frog_x = frog_x+20;
+	}else if(mydir == left){
+		frog_x = frog_x-20;
+	}
+	alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x, frog_y, frog_x+20, frog_y+24, 0xF000, 1);
+}
+
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 int main(){
@@ -194,8 +242,6 @@ int main(){
 //Initilize Variables
 	int x;
 	int time_var2 =0;
-	int frog_x = 120;
-	int frog_y = 216;
 	int sw0;
 	int i,j =0;
 	int truck_1 = 0;
@@ -216,15 +262,10 @@ int main(){
 		truck_1 = draw_truck(truck_1, 192, 1);
 		truck_2 = draw_truck(truck_2, 192, 1);
 
+		draw_frogger;
 
-//START - Frogger
-		sw0 = IORD_8DIRECT(YOUR_SWITCHES_ADDR, 0);
-		if(sw0 == 1){
-			frog_y = frog_y-24;
-			for(x=0; x<1000000; x++){}
-		}
-		alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x, frog_y, frog_x+20, frog_y+24, 0xF000, 1);
-//FINISH - Frogger
+
+
 
 
 		alt_up_pixel_buffer_dma_swap_buffers(pixel_buffer);
