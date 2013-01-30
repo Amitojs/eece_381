@@ -19,6 +19,6 @@ int file_read(char*, char*, int);
 //Prototype for the filename reader.
 int filenames_read(char*, int);
 //prototype for level data
-void level_data(char*, char*);
+void level_data(char*, char*, char*);
 
 #endif /* SD_INTERFACE_H_ */

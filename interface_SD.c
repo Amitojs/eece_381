@@ -34,6 +34,15 @@
  * pointer to a character buffer where the data will be stored, the name of a file i.e. "Readme.txt"
  * and the size of the character buffer. It will return the number of
  * characters read into the buffer.
+ *
+ * Example of use
+ *
+ *  char charbuffer[1024];
+	int charbuffersize = 1024;
+	char* charptr;
+	charptr = &charbuffer[0];
+	int charcount=0;
+ *  charcount = file_read(charptr, "README.TXT", charbuffersize);
  */
 int file_read(char* charbuffer, char* filename, int charmax){
 
@@ -87,6 +96,16 @@ int file_read(char* charbuffer, char* filename, int charmax){
  * The array will contain the filenames in the format [filename].[extension].
  * The filename must be eight characters or less in length and have a three character extension
  * The function returns the number of files within the array
+ *
+ * Example of use:
+ *
+ * 	char charbuffer[1024];
+	int charbuffersize = 1024;
+	char* charptr;
+	charptr = &charbuffer[0];
+	int charcount=0;
+
+	charcount = filenames_read(charptr, charbuffersize);
  */
 
 int filenames_read(char* filename, int charmax){
@@ -152,23 +171,47 @@ int filenames_read(char* filename, int charmax){
  * This function adds the leveldata from a text file into a 10 character buffer for storing the level data
  * This function takes two arguments, the filename and a pointer to the beginning of the
  * levelbuffer.
+ *
+ * Example of use:
+ *
+ *  char levelbuffer[10][16];
+ *  char objectbuffer [10][16];
+	char* levelptr;
+	char* objectptr;
+	int j;
+	levelptr = &levelbuffer[0][0];
+	level_data("level1.txt",levelptr, objectptr);
  */
-void level_data(char* filename, char* levelbuffer){
+void level_data(char* filename, char* levelbuffer, char* objectbuffer){
 
-	char data[256];
+	char data[1024];
 	char* dataptr;
 	int k;
+	int j;
 	dataptr = &data[0];
 
-	file_read(dataptr, filename, 256);
+	file_read(dataptr, filename, 1024);
 
 	while (*dataptr != '*')
 		dataptr++;
 	dataptr++;
 	for(k=0; k<10; k++){
-		*levelbuffer = *dataptr;
-		levelbuffer++;
+		for(j=0;j<16;j++){
+			*levelbuffer = *dataptr;
+			levelbuffer++;
+			dataptr++;
+		}
+	}
+
+	while (*dataptr != '$')
 		dataptr++;
+	dataptr++;
+	for(k=0; k<10; k++){
+		for(j=0;j<16;j++){
+			*objectbuffer = *dataptr;
+			objectbuffer++;
+			dataptr++;
+		}
 	}
 
 }
