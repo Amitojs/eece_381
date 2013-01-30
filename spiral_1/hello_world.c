@@ -28,7 +28,11 @@ alt_up_char_buffer_dev *char_buffer;
 //Global matrix
 int movement_matrix[10][16];
 
+//Global Time
+int time_var1 = 150;
+
 void init_matrix(){
+    int i, j = 0;
 	for (i=0; i<10; i++){
 		for (j=0; j<16; j++){
 			movement_matrix[i][j] = 0;
@@ -68,17 +72,35 @@ void initilize_vga(){
 	alt_up_char_buffer_clear(char_buffer);
 }
 
+void draw_background(){
+    //Finish
+    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 24, 320, 48, 0x0F00, 1);
+    //Water
+    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 48, 320, 120, 0x00F0, 1);
+    //Middle
+    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 120, 320, 144, 0x0F00, 1);
+    //Road
+    unsigned grey = 8 | (8 << 6) | (8 << 11);
+    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 144, 320, 216, grey, 1);
+    //Start
+    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 216, 320, 240, 0x0F00, 1);
+
+    alt_up_char_buffer_string(char_buffer, "Time Remaining: 0:60", 0, 0);
+    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 90, 0, 150, 3, 0x0F00, 1);
+    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 150, 0, time_var1, 3, 0xFFFF, 1);
+    alt_up_char_buffer_string(char_buffer, "Lives Remaining: 3", 0, 2);
+
+}
 
 int main(){
 
 	initilize_vga();
 
 //Initilize Variables
-	
+
 	int truck_1=0;
 	int truck_2=160;
 	int x;
-	int time_var1 = 150;
 	int time_var2 =0;
 	int frog_x = 120;
 	int frog_y = 216;
@@ -86,29 +108,13 @@ int main(){
 	int i,j =0;
 
 	alt_up_pixel_buffer_dma_clear_screen(pixel_buffer, 0);
-	
-	init_matrix();
+
 
 	while(1){
-		
-//START - Draw Background
-		//Finish
-		alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 24, 320, 48, 0x0F00, 1);
-		//Water
-		alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 48, 320, 120, 0x00F0, 1);
-		//Middle
-		alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 120, 320, 144, 0x0F00, 1);
-		//Road
-		unsigned grey = 8 | (8 << 6) | (8 << 11);
-		alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 144, 320, 216, grey, 1);
-		//Start
-		alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 216, 320, 240, 0x0F00, 1);
 
-		alt_up_char_buffer_string(char_buffer, "Time Remaining: 0:60", 0, 0);
-		alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 90, 0, 150, 3, 0x0F00, 1);
-		alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 150, 0, time_var1, 3, 0xFFFF, 1);
-		alt_up_char_buffer_string(char_buffer, "Lives Remaining: 3", 0, 2);
-//FINISH - Draw Background
+        init_matrix();
+        draw_background();
+
 
 //START - Trucks
 	//Truck 1
