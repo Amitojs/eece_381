@@ -153,6 +153,7 @@ int draw_truck(int truck, int y_location, int direction){
 	movement_matrix[y_location/24][(truck)/20] = 1;
 	if (truck >= 20){movement_matrix[y_location/24][(truck-20)/20] = 1;}
 	if (truck >= 40){movement_matrix[y_location/24][(truck-40)/20] = 1;}
+	if (truck >= 60){movement_matrix[y_location/24][(truck-60)/20] = 1;}
 	return truck;
 }
 void printgrid(){
@@ -222,13 +223,17 @@ dir getdir(){
 void draw_frogger(){
 	dir mydir = getdir();
 	if(mydir == up){
-		frog_y = frog_y-24;
+		if(frog_y > 24){
+			frog_y = frog_y-24;}
 	}else if(mydir == down){
-		frog_y = frog_y+24;
+		if(frog_y < 216){
+			frog_y = frog_y+24;}
 	}else if(mydir == right){
-		frog_x = frog_x+20;
+		if(frog_x < 300){
+			frog_x = frog_x+20;}
 	}else if(mydir == left){
-		frog_x = frog_x-20;
+		if(frog_x > 0){
+			frog_x = frog_x-20;}
 	}
 	alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x, frog_y, frog_x+20, frog_y+24, 0xF000, 1);
 }
@@ -262,11 +267,7 @@ int main(){
 		truck_1 = draw_truck(truck_1, 192, 1);
 		truck_2 = draw_truck(truck_2, 192, 1);
 
-		draw_frogger;
-
-
-
-
+		draw_frogger();
 
 		alt_up_pixel_buffer_dma_swap_buffers(pixel_buffer);
 
