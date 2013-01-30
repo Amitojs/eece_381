@@ -9,16 +9,32 @@
 //Change this in your local SD ram address in QSYS
 #define YOUR_SDRAM_ADDR 		0x80000
 
+//Change this to your local SW address
+#define YOUR_SWITCHES_ADDR		0x0004010
+
 //Change to your QSYS local name
 #define YOUR_PIXEL_BUFFER_NAME 	"/dev/pixel_buffer_dma"
 
 //Change to your QSYS local name
 #define YOUR_CHAR_BUFFER_NAME 	"/dev/char_drawer"
+
+
 //------------------------------------------------------
 
 //Initilize Pixel and Character Buffer
 alt_up_pixel_buffer_dma_dev* pixel_buffer;
 alt_up_char_buffer_dev *char_buffer;
+
+//Global matrix
+int movement_matrix[10][16];
+
+void init_matrix(){
+	for (i=0; i<10; i++){
+		for (j=0; j<16; j++){
+			movement_matrix[i][j] = 0;
+		}
+	}
+}
 
 void initilize_vga(){
 
@@ -58,7 +74,7 @@ int main(){
 	initilize_vga();
 
 //Initilize Variables
-	int movement_matrix[10][16] = {0};
+	
 	int truck_1=0;
 	int truck_2=160;
 	int x;
@@ -70,19 +86,10 @@ int main(){
 	int i,j =0;
 
 	alt_up_pixel_buffer_dma_clear_screen(pixel_buffer, 0);
+	
+	init_matrix();
 
 	while(1){
-
-	//Delay
-		//for(x=0; x<1000000; x++){}
-
-	//Makes all values of movement_matrix = 0
-		//memset(movement_matrix, 0, sizeof(movement_matrix[10][16]) * 10 * 16);
-		for (i=0; i<10; i++){
-			for (j=0; j<16; j++){
-				movement_matrix[i][j] = 0;
-			}
-		}
 		
 //START - Draw Background
 		//Finish
@@ -156,7 +163,7 @@ int main(){
 
 
 //START - Frogger
-		sw0 = IORD_8DIRECT(0x0004010, 0);
+		sw0 = IORD_8DIRECT(YOUR_SWITCHES_ADDR, 0);
 		if(sw0 == 1){
 			frog_y = frog_y-24;
 			for(x=0; x<1000000; x++){}
