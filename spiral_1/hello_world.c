@@ -11,14 +11,30 @@
 #define YOUR_SRAM_ADDR 			0x80000
 
 //Change this to your local SW address
-#define YOUR_SWITCHES_ADDR		0x0004010
+#define YOUR_SWITCHES_ADDR		0x4010//0x0002000
 
 //Change to your QSYS local name
-#define YOUR_PIXEL_BUFFER_NAME 	"/dev/pixel_buffer_dma"
+#define YOUR_PIXEL_BUFFER_NAME 	"/dev/pixel_buffer_dma"//"/dev/video_pixel_buffer_dma_0"
 
 //Change to your QSYS local name
 #define YOUR_CHAR_BUFFER_NAME 	"/dev/char_drawer"
 
+//------------------------------------------------------//
+
+
+
+
+//------------------------------------------------------\\
+// Level design
+typedef enum { NoBlock, Grass, Water, Highway, WinBlock } background;
+#define c_NoBlock 	0x0000
+#define c_Grass		0x0f00
+#define c_Water		0x00f0
+#define c_Highway	8 | (8 << 6) | (8 << 11)
+#define c_WinBlock	0x0f10
+
+#define gridx 16
+#define gridy 10
 //------------------------------------------------------//
 
 
@@ -37,20 +53,6 @@
 
 //------------------------------------------------------//
 
-
-
-//------------------------------------------------------\\
-// Level design
-typedef enum { NoBlock, Grass, Water, Highway, WinBlock } background;
-#define c_NoBlock 	0xffff
-#define c_Grass		0x0f00
-#define c_Water		0x00f0
-#define c_Highway	8 | (8 << 6) | (8 << 11)
-#define c_WinBlock	0x0f10
-
-#define gridx 10
-#define gridy 16
-//------------------------------------------------------//
 
 
 
@@ -113,6 +115,12 @@ void draw_background(){
     alt_up_char_buffer_string(char_buffer, "Lives Remaining: 3", 0, 2);
 
 }
+void draw_topinfo(){
+	alt_up_char_buffer_string(char_buffer, "Time Remaining: 0:60", 0, 0);
+    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 90, 0, 150, 3, 0x0F00, 1);
+    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 150, 0, time_var1, 3, 0xFFFF, 1);
+    alt_up_char_buffer_string(char_buffer, "Lives Remaining: 3", 0, 2);
+}
 //truck is the starting horizontal location
 //y_location is the constant starting vertical location
 //direction is the direction the truck moves in, 1 is to the right, and -1 is to the left
@@ -144,26 +152,26 @@ int draw_truck(int truck, int y_location, int direction){
 void printgrid(){
 	int i,j = 0;
 
-	for (i=0; i<gridx; i++){
-		for (j=1; j<gridy; j++){
+	for (i=0; i<gridy; i++){
+		for (j=0; j<gridx; j++){
 			if 		(g[i][j] == NoBlock)
-				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(i), (240/gridy)*(j), (320/gridx)*(i+1), (240/gridy)*(j+1), c_NoBlock, 0);
+				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(j), (240/gridy)*(i), (320/gridx)*(j+1), (240/gridy)*(i+1), c_NoBlock, 1);
 			else if (g[i][j] == Grass)
-				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(i), (240/gridy)*(j), (320/gridx)*(i+1), (240/gridy)*(j+1), c_Grass, 0);
+				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(j), (240/gridy)*(i), (320/gridx)*(j+1), (240/gridy)*(i+1), c_Grass, 1);
 			else if (g[i][j] == Water)
-				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(i), (240/gridy)*(j), (320/gridx)*(i+1), (240/gridy)*(j+1), c_Water, 0);
+				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(j), (240/gridy)*(i), (320/gridx)*(j+1), (240/gridy)*(i+1), c_Water, 1);
 			else if (g[i][j] == Highway)
-				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(i), (240/gridy)*(j), (320/gridx)*(i+1), (240/gridy)*(j+1), c_Highway, 0);
-			else  //(g[i][j] == WinBlock)
-				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(i), (240/gridy)*(j), (320/gridx)*(i+1), (240/gridy)*(j+1), c_WinBlock, 0);
+				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(j), (240/gridy)*(i), (320/gridx)*(j+1), (240/gridy)*(i+1), c_Highway, 1);
+			else if (g[i][j] == WinBlock)
+				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(j), (240/gridy)*(i), (320/gridx)*(j+1), (240/gridy)*(i+1), c_WinBlock, 1);
 
 		}
 	}
 }
 
 void setup_level(){
-	int i,j;
-	for ( i=0; i<10; i++ ){
+	int i;
+	for ( i=0; i<16; i++ ){
 		g[0][i] = NoBlock;
 		g[1][i] = WinBlock;
 		g[2][i] = Water;
@@ -196,14 +204,15 @@ int main(){
 	alt_up_pixel_buffer_dma_clear_screen(pixel_buffer, 0);
 
 	setup_level();
-	
+
 	while(1){
 
         init_matrix();
-		
+
         //draw_background();
 		printgrid();
-		
+		draw_topinfo();
+
 		truck_1 = draw_truck(truck_1, 192, 1);
 		truck_2 = draw_truck(truck_2, 192, 1);
 
