@@ -3,11 +3,12 @@
 #include <altera_up_avalon_video_pixel_buffer_dma.h>
 #include <altera_up_avalon_video_character_buffer_with_dma.h>
 
+
 //------------------------------------------------------\\
-//F_LOCAL:
+// Local NIOS numbers:
 
 //Change this in your local S ram address in QSYS
-#define YOUR_SRAM_ADDR 		0x80000
+#define YOUR_SRAM_ADDR 			0x80000
 
 //Change this to your local SW address
 #define YOUR_SWITCHES_ADDR		0x0004010
@@ -18,15 +19,6 @@
 //Change to your QSYS local name
 #define YOUR_CHAR_BUFFER_NAME 	"/dev/char_drawer"
 
-typedef enum { NoBlock, Grass, Water, Highway, WinBlock } background;
-#define c_NoBlock 	0xffff
-#define c_Grass		0x0f00
-#define c_Water		0x00f0
-#define c_Highway	8 | (8 << 6) | (8 << 11)
-#define c_WinBlock	0x0f10
-
-#define gridx 10
-#define gridy 16
 //------------------------------------------------------//
 
 
@@ -43,8 +35,23 @@ typedef enum { NoBlock, Grass, Water, Highway, WinBlock } background;
 	int time_var1 = 150;
 	background g[10][16];
 
-
 //------------------------------------------------------//
+
+
+
+//------------------------------------------------------\\
+// Level design
+typedef enum { NoBlock, Grass, Water, Highway, WinBlock } background;
+#define c_NoBlock 	0xffff
+#define c_Grass		0x0f00
+#define c_Water		0x00f0
+#define c_Highway	8 | (8 << 6) | (8 << 11)
+#define c_WinBlock	0x0f10
+
+#define gridx 10
+#define gridy 16
+//------------------------------------------------------//
+
 
 
 void init_matrix(){
@@ -57,7 +64,6 @@ void init_matrix(){
 }
 
 void initilize_vga(){
-
 	// Use the name of your pixel buffer DMA core
 	pixel_buffer = alt_up_pixel_buffer_dma_open_dev(YOUR_PIXEL_BUFFER_NAME);
 
@@ -154,6 +160,23 @@ void printgrid(){
 		}
 	}
 }
+
+void setup_level(){
+	int i,j;
+	for ( i=0; i<10; i++ ){
+		g[0][i] = NoBlock;
+		g[1][i] = WinBlock;
+		g[2][i] = Water;
+		g[3][i] = Water;
+		g[4][i] = Water;
+		g[5][i] = Grass;
+		g[6][i] = Highway;
+		g[7][i] = Highway;
+		g[8][i] = Highway;
+		g[9][i] = Grass;
+	}
+}
+
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 int main(){
@@ -172,11 +195,15 @@ int main(){
 
 	alt_up_pixel_buffer_dma_clear_screen(pixel_buffer, 0);
 
-
+	setup_level();
+	
 	while(1){
 
         init_matrix();
-        draw_background();
+		
+        //draw_background();
+		printgrid();
+		
 		truck_1 = draw_truck(truck_1, 192, 1);
 		truck_2 = draw_truck(truck_2, 192, 1);
 
