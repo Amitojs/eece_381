@@ -18,6 +18,15 @@
 //Change to your QSYS local name
 #define YOUR_CHAR_BUFFER_NAME 	"/dev/char_drawer"
 
+typedef enum { NoBlock, Grass, Water, Highway, WinBlock } background;
+#define c_NoBlock 	0xffff
+#define c_Grass		0x0f00
+#define c_Water		0x00f0
+#define c_Highway	8 | (8 << 6) | (8 << 11)
+#define c_WinBlock	0x0f10
+
+#define gridx 10
+#define gridy 16
 //------------------------------------------------------//
 
 
@@ -32,8 +41,8 @@
 
 	int movement_matrix[10][16];
 	int time_var1 = 150;
-	int truck_1=0;
-	int truck_2=160;
+	background g[10][16];
+
 
 //------------------------------------------------------//
 
@@ -98,59 +107,53 @@ void draw_background(){
     alt_up_char_buffer_string(char_buffer, "Lives Remaining: 3", 0, 2);
 
 }
+//truck is the starting horizontal location
+//y_location is the constant starting vertical location
+//direction is the direction the truck moves in, 1 is to the right, and -1 is to the left
+int draw_truck(int truck, int y_location, int direction){
 
-void trucks_test(void){
+	if(truck >= 20){
+		alt_up_pixel_buffer_dma_draw_box(pixel_buffer, truck-20, y_location, truck, y_location+23, 0xFF00, 1);
+	}else{
+		alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, truck, y_location+23, 0xFF00, 1);
+	}
+	if(truck >= 40){
+		alt_up_pixel_buffer_dma_draw_box(pixel_buffer, truck-40, y_location, truck-20, y_location+23, 0xFFFF, 1);
+	}else if(truck > 20 && truck < 40){
+		alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, truck-20, y_location+23, 0xFFFF, 1);
+	}
+	if (truck >= 60){
+		alt_up_pixel_buffer_dma_draw_box(pixel_buffer, truck-60, y_location, truck-40, y_location+23, 0xFFFF, 1);
+	}else if(truck > 40 && truck < 60){
+		alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, truck-40, y_location+23, 0xFFFF, 1);
+	}
 
-	//Truck 1
-		if(truck_1 >= 20){
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, truck_1-20, 192, truck_1, 215, 0xFF00, 1);
-		}else{
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 192, truck_1, 215, 0xFF00, 1);
-		}
-		if(truck_1 >= 40){
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, truck_1-40, 192, truck_1-20, 215, 0xFFFF, 1);
-		}else if(truck_1 > 20 && truck_1 < 40){
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 192, truck_1-20, 215, 0xFFFF, 1);
-		}
-		if (truck_1 >= 60){
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, truck_1-60, 192, truck_1-40, 215, 0xFFFF, 1);
-		}else if(truck_1 > 40 && truck_1 < 60){
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 192, truck_1-40, 215, 0xFFFF, 1);
-		}
-
-		truck_1=truck_1+1;
-		if(truck_1 == 380){truck_1=0;}
-		movement_matrix[192/24][(truck_1)/20] = 1;
-		if (truck_1 >= 20){movement_matrix[192/24][(truck_1-20)/20] = 1;}
-		if (truck_1 >= 40){movement_matrix[192/24][(truck_1-40)/20] = 1;}
-	//Truck 2
-		if(truck_2 >= 20){
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, truck_2-20, 192, truck_2, 215, 0xFF00, 1);
-		}else{
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 192, truck_2, 215, 0xFF00, 1);
-		}
-		if(truck_2 >= 40){
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, truck_2-40, 192, truck_2-20, 215, 0xFFFF, 1);
-		}else if(truck_2 > 20 && truck_2 < 40){
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 192, truck_2-20, 215, 0xFFFF, 1);
-		}
-		if (truck_2 >= 60){
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, truck_2-60, 192, truck_2-40, 215, 0xFFFF, 1);
-		}else if(truck_2 > 40 && truck_2 < 60){
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 192, truck_2-40, 215, 0xFFFF, 1);
-		}
-
-		truck_2=truck_2+1;
-		if(truck_2 == 380){
-			truck_2=0;
-		}
-
-		movement_matrix[192/24][(truck_2)/20] = 1;
-		if (truck_2 >= 20){movement_matrix[192/24][(truck_2-20)/20] = 1;}
-		if (truck_2 >= 40){movement_matrix[192/24][(truck_2-40)/20] = 1;}
-
+	truck=truck+1;
+	if(truck == 380){truck=0;}
+	movement_matrix[y_location/24][(truck)/20] = 1;
+	if (truck >= 20){movement_matrix[y_location/24][(truck-20)/20] = 1;}
+	if (truck >= 40){movement_matrix[y_location/24][(truck-40)/20] = 1;}
+	return truck;
 }
+void printgrid(){
+	int i,j = 0;
 
+	for (i=0; i<gridx; i++){
+		for (j=1; j<gridy; j++){
+			if 		(g[i][j] == NoBlock)
+				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(i), (240/gridy)*(j), (320/gridx)*(i+1), (240/gridy)*(j+1), c_NoBlock, 0);
+			else if (g[i][j] == Grass)
+				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(i), (240/gridy)*(j), (320/gridx)*(i+1), (240/gridy)*(j+1), c_Grass, 0);
+			else if (g[i][j] == Water)
+				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(i), (240/gridy)*(j), (320/gridx)*(i+1), (240/gridy)*(j+1), c_Water, 0);
+			else if (g[i][j] == Highway)
+				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(i), (240/gridy)*(j), (320/gridx)*(i+1), (240/gridy)*(j+1), c_Highway, 0);
+			else  //(g[i][j] == WinBlock)
+				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(i), (240/gridy)*(j), (320/gridx)*(i+1), (240/gridy)*(j+1), c_WinBlock, 0);
+
+		}
+	}
+}
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 int main(){
@@ -158,14 +161,14 @@ int main(){
 	initilize_vga();
 
 //Initilize Variables
-
-
 	int x;
 	int time_var2 =0;
 	int frog_x = 120;
 	int frog_y = 216;
 	int sw0;
 	int i,j =0;
+	int truck_1 = 0;
+	int truck_2 = 160;
 
 	alt_up_pixel_buffer_dma_clear_screen(pixel_buffer, 0);
 
@@ -174,7 +177,8 @@ int main(){
 
         init_matrix();
         draw_background();
-		trucks_test();
+		truck_1 = draw_truck(truck_1, 192, 1);
+		truck_2 = draw_truck(truck_2, 192, 1);
 
 
 //START - Frogger
