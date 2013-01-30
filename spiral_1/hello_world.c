@@ -54,7 +54,7 @@ int main(){
 	int frog_x = 120;
 	int frog_y = 216;
 	int sw0;
-
+	int i,j =0;
 
 	alt_up_pixel_buffer_dma_clear_screen(pixel_buffer, 0);
 
@@ -64,8 +64,13 @@ int main(){
 		//for(x=0; x<1000000; x++){}
 
 	//Makes all values of movement_matrix = 0
-		memset(movement_matrix, 0, sizeof(movement_matrix[10][16]) * 10 * 16);
-
+		//memset(movement_matrix, 0, sizeof(movement_matrix[10][16]) * 10 * 16);
+		for (i=0; i<10; i++){
+			for (j=0; j<16; j++){
+				movement_matrix[i][j] = 0;
+			}
+		}
+		
 //START - Draw Background
 		//Finish
 		alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 24, 320, 48, 0x0F00, 1);
