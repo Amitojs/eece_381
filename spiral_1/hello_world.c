@@ -3,6 +3,19 @@
 #include <altera_up_avalon_video_pixel_buffer_dma.h>
 #include <altera_up_avalon_video_character_buffer_with_dma.h>
 
+//------------------------------------------------------
+//F_LOCAL:
+
+//Change this in your local SD ram address in QSYS
+#define YOUR_SDRAM_ADDR 		0x80000
+
+//Change to your QSYS local name
+#define YOUR_PIXEL_BUFFER_NAME 	"/dev/pixel_buffer_dma"
+
+//Change to your QSYS local name
+#define YOUR_CHAR_BUFFER_NAME 	"/dev/char_drawer"
+//------------------------------------------------------
+
 //Initilize Pixel and Character Buffer
 alt_up_pixel_buffer_dma_dev* pixel_buffer;
 alt_up_char_buffer_dev *char_buffer;
@@ -10,10 +23,10 @@ alt_up_char_buffer_dev *char_buffer;
 void initilize_vga(){
 
 	// Use the name of your pixel buffer DMA core
-	pixel_buffer = alt_up_pixel_buffer_dma_open_dev("/dev/pixel_buffer_dma");
+	pixel_buffer = alt_up_pixel_buffer_dma_open_dev(YOUR_PIXEL_BUFFER_NAME);
 
-	unsigned int pixel_buffer_addr1 = PIXEL_BUFFER_BASE;
-	unsigned int pixel_buffer_addr2 = PIXEL_BUFFER_BASE + (320 * 240 * 2);
+	unsigned int pixel_buffer_addr1 = YOUR_SDRAM_ADDR;
+	unsigned int pixel_buffer_addr2 = YOUR_SDRAM_ADDR + (320 * 240 * 2);
 
 	// Set the 1st buffer address
 	alt_up_pixel_buffer_dma_change_back_buffer_address(pixel_buffer, pixel_buffer_addr1);
