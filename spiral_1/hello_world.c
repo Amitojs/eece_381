@@ -328,17 +328,7 @@ int die(){
 	for (i=0; i<10000000; i++);
 return 0;}
 
-int menu(){
-	unsigned int sel = 999;
-	int x = 80;
-
-	alt_up_char_buffer_clear(char_buffer);
-	alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 0, 320, 240, 0x0000, 0);
-	alt_up_char_buffer_string(char_buffer, "---MENU---", 30, 10);
-	alt_up_char_buffer_string(char_buffer, "Play", 30, 26);
-	alt_up_char_buffer_string(char_buffer, "High Scores", 30, 39);
-	alt_up_char_buffer_string(char_buffer, "Options", 30, 51);
-
+void menuhelper(sel, x){
 	if (sel%3 == 0){
 		alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 100, x+10, 110, 0xf000, 0);
 		alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 150, x+10, 160, 0x0000, 0);
@@ -352,43 +342,25 @@ int menu(){
 		alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 150, x+10, 160, 0x0000, 0);
 		alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 200, x+10, 210, 0xf000, 0);
 	}
+}
+
+int menu(){
+	unsigned int sel = 999;
+	int x = 80;
+
+	alt_up_char_buffer_clear(char_buffer);
+	alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 0, 320, 240, 0x0000, 0);
+	alt_up_char_buffer_string(char_buffer, "---MENU---", 30, 10);
+	alt_up_char_buffer_string(char_buffer, "Play", 30, 26);
+	alt_up_char_buffer_string(char_buffer, "High Scores", 30, 39);
+	alt_up_char_buffer_string(char_buffer, "Options", 30, 51);
+
+	menuhelper(sel, x);
 
 	for(;;){
 		dir mydir = getdir();
-		if (mydir == down) {
-			sel++;
-			if (sel%3 == 0){
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 100, x+10, 110, 0xf000, 0);
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 150, x+10, 160, 0x0000, 0);
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 200, x+10, 210, 0x0000, 0);
-				}else if (sel%3 == 1){
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 100, x+10, 110, 0x0000, 0);
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 150, x+10, 160, 0xf000, 0);
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 200, x+10, 210, 0x0000, 0);
-				}else if (sel%3 == 2){
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 100, x+10, 110, 0x0000, 0);
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 150, x+10, 160, 0x0000, 0);
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 200, x+10, 210, 0xf000, 0);
-				}
-
-		}
-		else if (mydir == up) {
-			sel--;
-			if (sel%3 == 0){
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 100, x+10, 110, 0xf000, 0);
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 150, x+10, 160, 0x0000, 0);
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 200, x+10, 210, 0x0000, 0);
-				}else if (sel%3 == 1){
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 100, x+10, 110, 0x0000, 0);
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 150, x+10, 160, 0xf000, 0);
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 200, x+10, 210, 0x0000, 0);
-				}else if (sel%3 == 2){
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 100, x+10, 110, 0x0000, 0);
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 150, x+10, 160, 0x0000, 0);
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 200, x+10, 210, 0xf000, 0);
-				}
-
-		}
+		if (mydir == down) menuhelper(++sel, x);
+		else if (mydir == up) menuhelper(--sel, x);
 		else if (mydir == left || mydir == right){
 			if (sel%3 == 0){
 				alt_up_char_buffer_clear(char_buffer);
@@ -415,71 +387,25 @@ int pause(){
 	alt_up_char_buffer_string(char_buffer, "Quit Game", 30, 39);
 	alt_up_char_buffer_string(char_buffer, "Options", 30, 51);
 
-	if (sel%3 == 0){
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 100, x+10, 110, 0xf000, 0);
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 150, x+10, 160, 0x0000, 0);
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 200, x+10, 210, 0x0000, 0);
-		}else if (sel%3 == 1){
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 100, x+10, 110, 0x0000, 0);
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 150, x+10, 160, 0xf000, 0);
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 200, x+10, 210, 0x0000, 0);
-		}else if (sel%3 == 2){
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 100, x+10, 110, 0x0000, 0);
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 150, x+10, 160, 0x0000, 0);
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 200, x+10, 210, 0xf000, 0);
+	menuhelper(sel, x);
+	for(;;){
+		dir mydir = getdir();
+		if (mydir == down) menuhelper(++sel, x);
+		else if (mydir == up) menuhelper(--sel, x);
+		else if (mydir == left || mydir == right){
+			if (sel%3 == 0){
+				alt_up_char_buffer_clear(char_buffer);
+				return 0;
+			}else if (sel%3 == 1){
+				//alt_up_char_buffer_clear(char_buffer);
+				return 1;
+			}else if (sel%3 == 2){
+				alt_up_char_buffer_clear(char_buffer);
+				return 2;
+			}
+			break;
 		}
-
-		for(;;){
-			dir mydir = getdir();
-			if (mydir == down) {
-				sel++;
-				if (sel%3 == 0){
-						alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 100, x+10, 110, 0xf000, 0);
-						alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 150, x+10, 160, 0x0000, 0);
-						alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 200, x+10, 210, 0x0000, 0);
-					}else if (sel%3 == 1){
-						alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 100, x+10, 110, 0x0000, 0);
-						alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 150, x+10, 160, 0xf000, 0);
-						alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 200, x+10, 210, 0x0000, 0);
-					}else if (sel%3 == 2){
-						alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 100, x+10, 110, 0x0000, 0);
-						alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 150, x+10, 160, 0x0000, 0);
-						alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 200, x+10, 210, 0xf000, 0);
-					}
-
-			}
-			else if (mydir == up) {
-				sel--;
-				if (sel%3 == 0){
-						alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 100, x+10, 110, 0xf000, 0);
-						alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 150, x+10, 160, 0x0000, 0);
-						alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 200, x+10, 210, 0x0000, 0);
-					}else if (sel%3 == 1){
-						alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 100, x+10, 110, 0x0000, 0);
-						alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 150, x+10, 160, 0xf000, 0);
-						alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 200, x+10, 210, 0x0000, 0);
-					}else if (sel%3 == 2){
-						alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 100, x+10, 110, 0x0000, 0);
-						alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 150, x+10, 160, 0x0000, 0);
-						alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 200, x+10, 210, 0xf000, 0);
-					}
-
-			}
-			else if (mydir == left || mydir == right){
-				if (sel%3 == 0){
-					alt_up_char_buffer_clear(char_buffer);
-					return 0;
-				}else if (sel%3 == 1){
-					//alt_up_char_buffer_clear(char_buffer);
-					return 1;
-				}else if (sel%3 == 2){
-					alt_up_char_buffer_clear(char_buffer);
-					return 2;
-				}
-				break;
-			}
-		}
-
+	}
 return 0;}
 
 
