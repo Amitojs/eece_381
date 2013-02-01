@@ -559,8 +559,11 @@ return 0;}
 int die(){
     int i;
     alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 0, 320, 240, 0x0000, 0);
-    alt_up_char_buffer_string(char_buffer, "YOU LOSE!", 30, 30);
-    for (i=0; i<10000000; i++);
+     if (time_var1 == 90){
+    	alt_up_char_buffer_string(char_buffer, "TIMES UP! YOU LOSE!", 30, 30);
+    }else
+    	alt_up_char_buffer_string(char_buffer, "YOU LOSE!", 30, 30);
+	for (i=0; i<10000000; i++);
 return 0;}
 
 void menuhelper(sel, x){
