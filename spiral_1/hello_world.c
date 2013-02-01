@@ -84,6 +84,9 @@ int die();
     int log_6 = 200;
     char time_remaining[20];
     char time_r[5];
+    char score[20];
+    char temp_highscore[20];
+    int highscore = 0;
 
 
 //-------------------------
@@ -169,6 +172,19 @@ void draw_topinfo(){
     }
     alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 90, 0, 150, 3, 0x0F00, 1);
     alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 150, 0, time_var1, 3, 0xFFFF, 1);
+//Score
+    if((time_var1-90)*(lives_remaining) >= 100){
+		sprintf(score, "Score: %d", (time_var1-90)*(lives_remaining));
+		alt_up_char_buffer_string(char_buffer, score, 0, 4);
+    }else if((time_var1-90)*(lives_remaining) >= 10){
+        sprintf(score, "Score:  %d", (time_var1-90)*(lives_remaining));
+        alt_up_char_buffer_string(char_buffer, score, 0, 4);
+	}else if((time_var1-90)*(lives_remaining) >= 0){
+		 sprintf(score, "Score:   %d", (time_var1-90)*(lives_remaining));
+		 alt_up_char_buffer_string(char_buffer, score, 0, 4);
+	}
+
+    //Lives Remaining
     switch (lives_remaining){
         case 3:
             alt_up_char_buffer_string(char_buffer, "Lives Remaining: 3", 0, 2);
@@ -411,8 +427,11 @@ void loadgame(){
 }
 
 int checkwin(){
-   if (g[frog_y/24][frog_x/20] == WinBlock)
-       return 1;
+   if (g[frog_y/24][frog_x/20] == WinBlock){
+	   if ((time_var1-90)*(lives_remaining) > highscore){
+		   highscore = (time_var1-90)*(lives_remaining);}
+	   return 1;
+   }
    else
        return 0;
 }
@@ -559,7 +578,12 @@ int mainrun(){
 int highscores(){
     int i;
     alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 0, 320, 240, 0x0000, 0);
-    alt_up_char_buffer_string(char_buffer, "High Scores unavailable.", 30, 30);
+    if (highscore == 0){
+    	alt_up_char_buffer_string(char_buffer, "High Scores unavailable.", 30, 30);
+    }else{
+    	sprintf(temp_highscore, "High Score: %d", highscore);
+    	alt_up_char_buffer_string(char_buffer, temp_highscore, 30, 30);
+    }
     for (i=0; i<10000000; i++);
 return 0;}
 
