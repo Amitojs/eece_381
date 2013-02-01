@@ -202,9 +202,10 @@ int draw_car(int car, int y_location, int colour, int direction){
             }else if(car> 20 && car< 40){
                 alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, car-20, y_location+23, colour, 1);
             }
-            ++car;
+            car=car+2;
 
-            if(car== 380){car=0;}
+
+            if(car >= 380){car=0;}
             movement_matrix[y_location/24][(car)/20] = 1;
             if (car>= 20){movement_matrix[y_location/24][(car-20)/20] = 1;}
             if (car>= 40){movement_matrix[y_location/24][(car-40)/20] = 1;}
@@ -220,8 +221,8 @@ int draw_car(int car, int y_location, int colour, int direction){
             }else{
                 alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, car, y_location+23, colour, 1);
             }
-            --car;
-            if(car== 0){car=360;}
+            car=car-2;
+            if(car <= 0){car=360;}
             movement_matrix[y_location/24][(car)/20] = 1;
             if (car>= 20){movement_matrix[y_location/24][(car-20)/20] = 1;}
             if (car>= 40){movement_matrix[y_location/24][(car-40)/20] = 1;}
@@ -434,6 +435,10 @@ int mainrun(){
             ++time_var2;
             if (time_var2 >=60 && time_var1 >= 90){
                 --time_var1;
+                if (time_var1 == 90){
+                	die();
+                	return 0;
+                }
                 time_var2=0;
             }
         }
