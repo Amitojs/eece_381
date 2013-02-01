@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <io.h>
+#include <stdlib.h>
+#include <string.h>
 #include <altera_up_avalon_video_pixel_buffer_dma.h>
 #include <altera_up_avalon_video_character_buffer_with_dma.h>
 
@@ -80,6 +82,8 @@ int die();
     int log_4 = 150;
     int log_5 = 70;
     int log_6 = 200;
+    char time_remaining[20];
+    char time_r[5];
 
 
 //-------------------------
@@ -152,7 +156,17 @@ void initilize_vga(){
 
 
 void draw_topinfo(){
-    alt_up_char_buffer_string(char_buffer, "Time Remaining: 0:60", 0, 0);
+    if((time_var1 - 90) >= 10){
+		strncpy(time_remaining, "Time Remaining: ", sizeof(time_remaining));
+		sprintf(time_r, "%d", time_var1-90);
+		strncat(time_remaining, time_r , 2);
+		alt_up_char_buffer_string(char_buffer, time_remaining, 0, 0);
+    }else{
+    	strncpy(time_remaining, "Time Remaining: ", sizeof(time_remaining));
+		sprintf(time_r, " %d", time_var1-90);
+		strncat(time_remaining, time_r , 2);
+		alt_up_char_buffer_string(char_buffer, time_remaining, 0, 0);
+    }
     alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 90, 0, 150, 3, 0x0F00, 1);
     alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 150, 0, time_var1, 3, 0xFFFF, 1);
     switch (lives_remaining){
@@ -559,11 +573,12 @@ return 0;}
 int die(){
     int i;
     alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 0, 320, 240, 0x0000, 0);
-     if (time_var1 == 90){
+    if (time_var1 == 90){
     	alt_up_char_buffer_string(char_buffer, "TIMES UP! YOU LOSE!", 30, 30);
-    }else
-    	alt_up_char_buffer_string(char_buffer, "YOU LOSE!", 30, 30);
-	for (i=0; i<10000000; i++);
+    }else{
+    	alt_up_char_buffer_string(char_buffer, "YOU LOSE!", 30, 30);}
+
+    for (i=0; i<10000000; i++);
 return 0;}
 
 void menuhelper(sel, x){
