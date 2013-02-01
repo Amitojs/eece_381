@@ -306,9 +306,9 @@ void printgrid(){
 
     for (i=0; i<gridy; i++){
         for (j=0; j<gridx; j++){
-            if      (g[i][j] == NoBlock)
+            if      (g[i][j] == NoBlock)  /////Don't really need to draw this - Amitoj////////
                 alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(j), (240/gridy)*(i), (320/gridx)*(j+1), (240/gridy)*(i+1), c_NoBlock, 1);
-            else if (g[i][j] == Grass)
+             if (g[i][j] == Grass)
                 alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(j), (240/gridy)*(i), (320/gridx)*(j+1), (240/gridy)*(i+1), c_Grass, 1);
             else if (g[i][j] == Water){
                 alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(j), (240/gridy)*(i), (320/gridx)*(j+1), (240/gridy)*(i+1), c_Water, 1);
@@ -455,7 +455,10 @@ int draw_frogger(){
             return 1;
         }
     }
-    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x, frog_y, frog_x+20, frog_y+23, 0xF000, 1);
+    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x,    frog_y,   frog_x+20, frog_y+23, 0xF000, 1);
+    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x+2,  frog_y+4, frog_x+7,  frog_y+6,  0x0000, 1);
+    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x+13, frog_y+4, frog_x+18, frog_y+6,  0x0000, 1);
+
     return 0;
 }
 
@@ -487,12 +490,12 @@ int mainrun(){
         car_4 = draw_car(car_4,  144, 0x867,  1);
         car_5 = draw_car(car_5,  144, 0x165,  1);
         car_6 = draw_car(car_6,  144, 0x378,  1);
-        log_1 = draw_log(log_1,  96,  0x000,  3,  1);
-        log_2 = draw_log(log_2,  96,  0x000,  2,  1);
-        log_3 = draw_log(log_3,  72,  0x000,  3, -1);
-        log_4 = draw_log(log_4,  72,  0x000,  2, -1);
-        log_5 = draw_log(log_5,  48,  0x000,  3,  1);
-        log_6 = draw_log(log_6,  48,  0x000,  3,  1);
+        log_1 = draw_log(log_1,  96,  0x5200,  3,  1);
+        log_2 = draw_log(log_2,  96,  0x5200,  2,  1);
+        log_3 = draw_log(log_3,  72,  0x5200,  3, -1);
+        log_4 = draw_log(log_4,  72,  0x5200,  2, -1);
+        log_5 = draw_log(log_5,  48,  0x5200,  3,  1);
+        log_6 = draw_log(log_6,  48,  0x5200,  3,  1);
 
 
         //If the movment function returns a 1, that means user quit the game
@@ -501,8 +504,8 @@ int mainrun(){
             return 0;
         }
 
-        alt_up_pixel_buffer_dma_swap_buffers(pixel_buffer);
-
+        while (alt_up_pixel_buffer_dma_swap_buffers(pixel_buffer) != 0){};
+        while (alt_up_pixel_buffer_dma_check_swap_buffers_status(pixel_buffer) != 0){};
 
 //START - Collision
         if(movement_matrix[frog_y/24][frog_x/20] == 1 ){
