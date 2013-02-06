@@ -13,12 +13,12 @@
 #define YOUR_SRAM_ADDR          0x80000
 
 //Change this to your local SW address
-//#define YOUR_SWITCHES_ADDR        0x2000  //Scott's
-#define YOUR_SWITCHES_ADDR      0x4010  //Amitoj's
+#define YOUR_SWITCHES_ADDR        0x2000  //Scott's
+//#define YOUR_SWITCHES_ADDR      0x4010  //Amitoj's
 
 //Change to your QSYS local name
-//#define YOUR_PIXEL_BUFFER_NAME    "/dev/video_pixel_buffer_dma_0"  //Scott's
-#define YOUR_PIXEL_BUFFER_NAME  "/dev/pixel_buffer_dma"  //Amitoj's
+#define YOUR_PIXEL_BUFFER_NAME    "/dev/video_pixel_buffer_dma_0"  //Scott's
+//#define YOUR_PIXEL_BUFFER_NAME  "/dev/pixel_buffer_dma"  //Amitoj's
 
 //Change to your QSYS local name
 #define YOUR_CHAR_BUFFER_NAME   "/dev/char_drawer"
@@ -40,8 +40,8 @@ typedef enum { NoBlock, Grass, Water, Highway, WinBlock, Highway_t } background;
 #define c_WinBlock  0x0f10
 #define c_Yellow	0xff00
 
-#define gridx 20 //16
-#define gridy 12 //10
+#define gridx 16 //16
+#define gridy 10 //10
 
 int pause();
 int win();
@@ -68,26 +68,17 @@ int die();
     int frog_y;
     int lives_remaining;
     int time_var2;
-    int truck_1;
-    int truck_2;
-    int car_1;
-    int car_2;
-    int car_3;
-    int car_4;
-    int car_5;
-    int car_6;
-    int log_1;
-    int log_2;
-    int log_3;
-    int log_4;
-    int log_5;
-    int log_6;
+    int truck_1,truck_2;
+    //int car_1,	car_2,	car_3,	car_4,	car_5,	car_6;
+    int log_1,	log_2,	log_3,	log_4,	log_5,	log_6;
     char time_remaining[20];
     char time_r[5];
     char score[20];
     char temp_highscore[20];
     int highscore = 0;
 
+#define numcars 6
+    int cars[numcars];
 
 
 //-------------------------
@@ -98,20 +89,11 @@ int die();
     int s_frog_y;
     int s_lives_remaining;
     int s_time_var2;
-    int s_truck_1;
-    int s_truck_2;
-    int s_car_1;
-    int s_car_2;
-    int s_car_3;
-    int s_car_4;
-    int s_car_5;
-    int s_car_6;
-    int s_log_1;
-	int s_log_2;
-	int s_log_3;
-	int s_log_4;
-	int s_log_5;
-	int s_log_6;
+    int s_truck_1,	s_truck_2;
+    //int s_car_1,	s_car_2,	s_car_3,	s_car_4,	s_car_5,	s_car_6;
+    int s_log_1,	s_log_2,	s_log_3,	s_log_4,	s_log_5,	s_log_6;
+
+    int s_cars[numcars];
 
 //------------------------------------------------------
 
@@ -315,19 +297,19 @@ void setup_level(){
         g[1][i] = WinBlock;
         g[2][i] = Water;
         g[3][i] = Water;
-        g[3][7] = Grass;
-        g[3][8] = Grass;
+        	//g[3][7] = Grass;
+        	//g[3][8] = Grass;
         g[4][i] = Water;
         g[5][i] = Grass;
-        g[5][0] = Water;
-        g[5][15] = Water;
-        g[5][7] = Water;
-        g[5][8] = Water;
+        	g[5][0] = Water;
+        	g[5][gridx-1] = Water;
+        	//g[5][7] = Water;
+        	//g[5][8] = Water;
         g[6][i] = Highway;
-        if(i%2)	g[7][i] = Highway;
-        else	g[7][i] = Highway_t;
-        if(i%2)	g[8][i] = Highway;
-        else	g[8][i] = Highway_t;
+        	if(i%2)	g[7][i] = Highway;
+        	else	g[7][i] = Highway_t;
+        	if(i%2)	g[8][i] = Highway;
+        	else	g[8][i] = Highway_t;
         g[9][i] = Grass;
         g[10][i] = Grass;
         g[11][i] = Grass;
@@ -336,6 +318,7 @@ void setup_level(){
 }
 
 void savegame(){
+	int i;
     issavegame = 1;
     //Save the status of the game to be loaded
     s_time_var1 = time_var1;
@@ -345,12 +328,11 @@ void savegame(){
     s_time_var2 = time_var2;
     s_truck_1 = truck_1;
     s_truck_2 = truck_2;
-    s_car_1 = car_1;
-    s_car_2 = car_2;
-    s_car_3 = car_3;
-    s_car_4 = car_4;
-    s_car_5 = car_5;
-    s_car_6 = car_6;
+
+    for (i = 0; i <= numcars; i++){
+    	s_cars[i] = cars[i];
+    }
+
     s_log_1 = log_1;
 	s_log_2 = log_2;
 	s_log_3 = log_3;
@@ -375,12 +357,11 @@ void loadgame(){
         time_var2 = s_time_var2;
         truck_1 = s_truck_1;
         truck_2 = s_truck_2;
-        car_1 = s_car_1;
-        car_2 = s_car_2;
-        car_3 = s_car_3;
-        car_4 = s_car_4;
-        car_5 = s_car_5;
-        car_6 = s_car_6;
+
+        for (i = 0; i <= numcars; i++){
+            cars[i] = s_cars[i];
+          }
+
         log_1 = s_log_1;
         log_2 = s_log_2;
         log_3 = s_log_3;
@@ -478,12 +459,13 @@ int playgame(){
 
         truck_1 = draw_vehicle(truck, truck_1, (240/gridy)*8, 0x678,  3,  1, 1);
         truck_2 = draw_vehicle(truck, truck_2, (240/gridy)*8, 0x534,  3,  1, 1);
-        car_1 	= draw_vehicle(car,   car_1,   (240/gridy)*7, 0x267,  2, -1, 2);
-        car_2 	= draw_vehicle(car,   car_2,   (240/gridy)*7, 0x234,  2, -1, 2);
-        car_3 	= draw_vehicle(car,   car_3,   (240/gridy)*7, 0x533,  2, -1, 2);
-        car_4 	= draw_vehicle(car,   car_4,   (240/gridy)*6, 0x867,  2,  1, 2);
-        car_5 	= draw_vehicle(car,   car_5,   (240/gridy)*6, 0x165,  2,  1, 2);
-        car_6 	= draw_vehicle(car,   car_6,   (240/gridy)*6, 0x378,  2,  1, 2);
+
+        cars[0] = draw_vehicle(car,   cars[0],   (240/gridy)*7, 0x267,  2, -1, 2);
+        cars[1] = draw_vehicle(car,   cars[1],   (240/gridy)*7, 0x234,  2, -1, 2);
+        cars[2] = draw_vehicle(car,   cars[2],   (240/gridy)*7, 0x533,  2, -1, 2);
+        cars[3] = draw_vehicle(car,   cars[3],   (240/gridy)*6, 0x867,  2,  1, 2);
+        cars[4] = draw_vehicle(car,   cars[4],   (240/gridy)*6, 0x165,  2,  1, 2);
+        cars[5] = draw_vehicle(car,   cars[5],   (240/gridy)*6, 0x378,  2,  1, 2);
 
         log_1 	= draw_vehicle(log,   log_1,   (240/gridy)*4, 0x5200,  3,   1, 1);
         log_2 	= draw_vehicle(log,   log_2,   (240/gridy)*4, 0x5200,  2,   1, 1);
@@ -669,12 +651,14 @@ int main(){
     	time_var2 =0;
     	truck_1 = (320/gridx)*0;
     	truck_2 = (320/gridx)*8;
-    	car_1 	= (320/gridx)*1;
-    	car_2 	= (320/gridx)*6;
-    	car_3 	= (320/gridx)*11;
-    	car_4 	= (320/gridx)*2.5;
-    	car_5 	= (320/gridx)*7.5;
-    	car_6 	= (320/gridx)*12.5;
+
+    	cars[0] = (320/gridx)*1;
+    	cars[1] = (320/gridx)*6;
+    	cars[2] = (320/gridx)*11;
+    	cars[3] = (320/gridx)*2.5;
+    	cars[4] = (320/gridx)*7.5;
+    	cars[5] = (320/gridx)*12.5;
+
     	log_1 	= (320/gridx)*1;
     	log_2 	= (320/gridx)*5;
     	log_3 	= (320/gridx)*2.5;
