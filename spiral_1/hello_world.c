@@ -13,12 +13,12 @@
 #define YOUR_SRAM_ADDR          0x80000
 
 //Change this to your local SW address
-#define YOUR_SWITCHES_ADDR        0x2000  //Scott's
-//#define YOUR_SWITCHES_ADDR      0x4010  //Amitoj's
+//#define YOUR_SWITCHES_ADDR        0x2000  //Scott's
+#define YOUR_SWITCHES_ADDR      0x4010  //Amitoj's
 
 //Change to your QSYS local name
-#define YOUR_PIXEL_BUFFER_NAME    "/dev/video_pixel_buffer_dma_0"  //Scott's
-//#define YOUR_PIXEL_BUFFER_NAME  "/dev/pixel_buffer_dma"  //Amitoj's
+//#define YOUR_PIXEL_BUFFER_NAME    "/dev/video_pixel_buffer_dma_0"  //Scott's
+#define YOUR_PIXEL_BUFFER_NAME  "/dev/pixel_buffer_dma"  //Amitoj's
 
 //Change to your QSYS local name
 #define YOUR_CHAR_BUFFER_NAME   "/dev/char_drawer"
@@ -40,8 +40,8 @@ typedef enum { NoBlock, Grass, Water, Highway, WinBlock, Highway_t } background;
 #define c_WinBlock  0x0f10
 #define c_Yellow	0xff00
 
-#define gridx 16 //16
-#define gridy 10 //10
+#define gridx 20 //16
+#define gridy 12 //10
 
 int pause();
 int win();
@@ -202,135 +202,85 @@ void draw_topinfo(){
     }
 }
 
-//truck is the starting horizontal location
-//y_location is the constant starting vertical location
-//direction is the direction the truck moves in, 1 is to the right, and -1 is to the left
-int draw_truck(int truck, int y_location, int direction){
 
-    if(truck >= 20){
-        alt_up_pixel_buffer_dma_draw_box(pixel_buffer, truck-20, y_location, truck, y_location+23, 0xFF00, 1);
-    }else{
-        alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, truck, y_location+23, 0xFF00, 1);
-    }
-    if(truck >= 40){
-        alt_up_pixel_buffer_dma_draw_box(pixel_buffer, truck-40, y_location, truck-20, y_location+23, 0xFFFF, 1);
-    }else if(truck > 20 && truck < 40){
-        alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, truck-20, y_location+23, 0xFFFF, 1);
-    }
-    if (truck >= 60){
-        alt_up_pixel_buffer_dma_draw_box(pixel_buffer, truck-60, y_location, truck-40, y_location+23, 0xFFFF, 1);
-    }else if(truck > 40 && truck < 60){
-        alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, truck-40, y_location+23, 0xFFFF, 1);
-    }
+int draw_vehicle(vehicle myvehicle, int x_location, int y_location, int colour, int size, int direction, int speed){
+	int colour_2;
+	int colour_3;
 
-    truck=truck+1;
-    if(truck == 380){truck=0;}
-    movement_matrix[y_location/24][(truck)/20] = 1;
-    if (truck >= 20){movement_matrix[y_location/24][(truck-20)/20] = 1;}
-    if (truck >= 40){movement_matrix[y_location/24][(truck-40)/20] = 1;}
-    if (truck >= 60){movement_matrix[y_location/24][(truck-60)/20] = 1;}
-    return truck;
-}
+	if (myvehicle == truck){
+		colour_2 = 0xFFFF;  //Making Trailer of Truck White
+		colour_3 = 0xFFFF;	//Making Trailer of Truck White
+	}else{
+		colour_2 = colour;
+		colour_3 = colour;
+	}
 
-//car is the starting horizontal location
-//y_location is the constant starting vertical location
-//color is the color of the car
-//direction is the direction the car moves in, 1 is to the right, and -1 is to the left
-int draw_car(int car, int y_location, int colour, int direction){
     switch(direction){
         case 1:
-            if(car>= 20){
-                    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, car-20, y_location, car, y_location+23, colour, 1);
+            if(x_location>= (320/gridx)){
+                    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-(320/gridx), y_location, x_location, y_location+(240/gridy) - 1, colour, 1);
             }else{
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, car, y_location+23, colour, 1);
+                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location, y_location+(240/gridy) - 1, colour, 1);
             }
-            if(car>= 40){
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, car-40, y_location, car-20, y_location+23, colour, 1);
-            }else if(car> 20 && car< 40){
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, car-20, y_location+23, colour, 1);
+            if(x_location>= 40){
+                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-40, y_location, x_location-(320/gridx), y_location+(240/gridy) - 1, colour_2, 1);
+            }else if(x_location> (320/gridx) && x_location< 40){
+                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location-(320/gridx), y_location+(240/gridy) - 1, colour_2, 1);
             }
-            car=car+2;
+            if (x_location >= 60 && size == 3){
+            	alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-60, y_location, x_location-40, y_location+(240/gridy) - 1, colour_3, 1);
+            }else if(x_location > 40 && x_location < 60 && size == 3){
+            	alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location-40, y_location+(240/gridy) - 1, colour_3, 1);
+            }
 
+            x_location=x_location+speed;
+            if(x_location >= (320/gridx)*(gridx+3)){x_location=0;}
+            if (myvehicle == log){
+				movement_matrix[y_location/(240/gridy)][(x_location)/(320/gridx)] = 0;
+				if (x_location >= (320/gridx)){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = 0;}
+				if (x_location >= (320/gridx)*2){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx)*2)/(320/gridx)] = 0;}
+				if (x_location >= (320/gridx)*3 && size == 3){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx)*3)/(320/gridx)] = 0;}
+            }else{
+            	movement_matrix[y_location/(240/gridy)][(x_location)/(320/gridx)] = 1;
+				if (x_location >= (320/gridx)){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = 1;}
+				if (x_location >= (320/gridx)*2){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx)*2)/(320/gridx)] = 1;}
+				if (x_location >= (320/gridx)*3 && size == 3){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx)*3)/(320/gridx)] = 1;}
 
-            if(car >= 380){car=0;}
-            movement_matrix[y_location/24][(car)/20] = 1;
-            if (car>= 20){movement_matrix[y_location/24][(car-20)/20] = 1;}
-            if (car>= 40){movement_matrix[y_location/24][(car-40)/20] = 1;}
+            }
             break;
         default:
-            if(car >= 40){
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, car-40, y_location, car-20, y_location+23, colour, 1);
-            }else if(car > 20 && car < 40){
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, car-20, y_location+23, colour, 1);
-            }
-            if(car >= 20){
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, car-20, y_location, car, y_location+23, colour, 1);
+            if(x_location >= (320/gridx)){
+                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-(320/gridx), y_location, x_location, y_location+(240/gridy) - 1, colour, 1);
             }else{
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, car, y_location+23, colour, 1);
+                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location, y_location+(240/gridy) - 1, colour, 1);
             }
-            car=car-2;
-            if(car <= 0){car=360;}
-            movement_matrix[y_location/24][(car)/20] = 1;
-            if (car>= 20){movement_matrix[y_location/24][(car-20)/20] = 1;}
-            if (car>= 40){movement_matrix[y_location/24][(car-40)/20] = 1;}
-            break;
+            if(x_location >= (320/gridx)*2){
+                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-(320/gridx)*2, y_location, x_location-(320/gridx), y_location+(240/gridy) - 1, colour_2, 1);
+            }else if(x_location > (320/gridx) && x_location < (320/gridx)*2){
+                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location-(320/gridx), y_location+(240/gridy) - 1, colour_2, 1);
             }
-
-    return car;
-}
-
-int draw_log(int log, int y_location, int colour, int size, int direction){
-    switch(direction){
-        case 1:
-            if(log>= 20){
-                    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, log-20, y_location, log, y_location+23, colour, 1);
-            }else{
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, log, y_location+23, colour, 1);
-            }
-            if(log>= 40){
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, log-40, y_location, log-20, y_location+23, colour, 1);
-            }else if(log> 20 && log< 40){
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, log-20, y_location+23, colour, 1);
-            }
-            if (log >= 60 && size == 3){
-            	alt_up_pixel_buffer_dma_draw_box(pixel_buffer, log-60, y_location, log-40, y_location+23, colour, 1);
-            }else if(log > 40 && log < 60 && size == 3){
-            	alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, log-40, y_location+23, colour, 1);
-            }
-
-            log=log+1;
-            if(log >= 380){log=0;}
-            movement_matrix[y_location/24][(log)/20] = 0;
-            if (log>= 20){movement_matrix[y_location/24][(log-20)/20] = 0;}
-            if (log>= 40){movement_matrix[y_location/24][(log-40)/20] = 0;}
-            if (log >= 60 && size == 3){movement_matrix[y_location/24][(log-60)/20] = 0;}
-            break;
-        default:
-            if(log >= 20){
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, log-20, y_location, log, y_location+23, colour, 1);
-            }else{
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, log, y_location+23, colour, 1);
-            }
-            if(log >= 40){
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, log-40, y_location, log-20, y_location+23, colour, 1);
-            }else if(log > 20 && log < 40){
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, log-20, y_location+23, colour, 1);
-            }
-            if(log >= 60 && size == 3){
-				 alt_up_pixel_buffer_dma_draw_box(pixel_buffer, log-60, y_location, log-40, y_location+23, colour, 1);
-			 }else if(log > 40 && log < 60 && size == 3){
-				 alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, log-40, y_location+23, colour, 1);
+            if(x_location >= (320/gridx)*3 && size == 3){
+				 alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-(320/gridx)*3, y_location, x_location-(320/gridx)*2, y_location+(240/gridy) - 1, colour_3, 1);
+			 }else if(x_location > (320/gridx)*2 && x_location < (320/gridx)*3 && size == 3){
+				 alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location-(320/gridx)*2, y_location+(240/gridy) - 1, colour_3, 1);
 			 }
-            log=log-1;
-            if(log <= 0){log=380;}
-            movement_matrix[y_location/24][(log)/20] = 0;
-            if (log>= 20){movement_matrix[y_location/24][(log-20)/20] = 0;}
-            if (log>= 40){movement_matrix[y_location/24][(log-40)/20] = 0;}
-            if (log>= 60 && size == 3){movement_matrix[y_location/24][(log-60)/20] = 0;}
+            x_location=x_location-speed;
+            if(x_location <= 0){x_location=(320/gridx)*(gridx+2);}
+            if (myvehicle == log){
+            movement_matrix[y_location/(240/gridy)][(x_location)/(320/gridx)] = 0;
+				if (x_location>= (320/gridx)){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = 0;}
+				if (x_location>= (320/gridx)*2){movement_matrix[y_location/(240/gridy)][(x_location-((320/gridx)*2))/(320/gridx)] = 0;}
+				if (x_location>= (320/gridx)*3 && size == 3){movement_matrix[y_location/(240/gridy)][(x_location-((320/gridx)*3))/(320/gridx)] = 0;}
+            }else{
+            	if (x_location>= (320/gridx)){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = 1;}
+				if (x_location>= (320/gridx)*2){movement_matrix[y_location/(240/gridy)][(x_location-((320/gridx)*2))/(320/gridx)] = 1;}
+				if (x_location>= (320/gridx)*3 && size == 3){movement_matrix[y_location/(240/gridy)][(x_location-((320/gridx)*3))/(320/gridx)] = 1;}
+            }
             break;
     	}
-    return log;
+    return x_location;
 }
+
 
 void printgrid(){
     int i,j = 0;
@@ -526,20 +476,23 @@ int playgame(){
         printgrid();
         draw_topinfo();
 
-        truck_1 = draw_truck(truck_1, (240/gridy)*8, 1);
-        truck_2 = draw_truck(truck_2, (240/gridy)*8, 1);
-        car_1 	= draw_car	(car_1,   (240/gridy)*7,  0x267, -1);
-        car_2 	= draw_car	(car_2,   (240/gridy)*7,  0x234, -1);
-        car_3 	= draw_car	(car_3,   (240/gridy)*7,  0x533, -1);
-        car_4 	= draw_car	(car_4,   (240/gridy)*6,  0x867,  1);
-        car_5 	= draw_car	(car_5,   (240/gridy)*6,  0x165,  1);
-        car_6 	= draw_car	(car_6,   (240/gridy)*6,  0x378,  1);
-        log_1 	= draw_log	(log_1,   (240/gridy)*4,  0x5200,  3,  1);
-        log_2 	= draw_log	(log_2,   (240/gridy)*4,  0x5200,  2,  1);
-        log_3 	= draw_log	(log_3,   (240/gridy)*3,  0x5200,  3, -1);
-        log_4 	= draw_log	(log_4,   (240/gridy)*3,  0x5200,  2, -1);
-        log_5 	= draw_log	(log_5,   (240/gridy)*2,  0x5200,  3,  1);
-        log_6 	= draw_log	(log_6,   (240/gridy)*2,  0x5200,  3,  1);
+        truck_1 = draw_vehicle(truck, truck_1, (240/gridy)*8, 0x678,  3,  1, 1);
+        truck_2 = draw_vehicle(truck, truck_2, (240/gridy)*8, 0x534,  3,  1, 1);
+        car_1 	= draw_vehicle(car,   car_1,   (240/gridy)*7, 0x267,  2, -1, 2);
+        car_2 	= draw_vehicle(car,   car_2,   (240/gridy)*7, 0x234,  2, -1, 2);
+        car_3 	= draw_vehicle(car,   car_3,   (240/gridy)*7, 0x533,  2, -1, 2);
+        car_4 	= draw_vehicle(car,   car_4,   (240/gridy)*6, 0x867,  2,  1, 2);
+        car_5 	= draw_vehicle(car,   car_5,   (240/gridy)*6, 0x165,  2,  1, 2);
+        car_6 	= draw_vehicle(car,   car_6,   (240/gridy)*6, 0x378,  2,  1, 2);
+
+        log_1 	= draw_vehicle(log,   log_1,   (240/gridy)*4, 0x5200,  3,   1, 1);
+        log_2 	= draw_vehicle(log,   log_2,   (240/gridy)*4, 0x5200,  2,   1, 1);
+        log_3 	= draw_vehicle(log,   log_3,   (240/gridy)*3, 0x5200,  3,  -1, 1);
+        log_4 	= draw_vehicle(log,   log_4,   (240/gridy)*3, 0x5200,  2,  -1, 1);
+        log_5 	= draw_vehicle(log,   log_5,   (240/gridy)*2, 0x5200,  3,   1, 1);
+        log_6 	= draw_vehicle(log,   log_6,   (240/gridy)*2, 0x5200,  3,   1, 1);
+
+
 
 
         //If the movement function returns a 1, that means user quit the game
