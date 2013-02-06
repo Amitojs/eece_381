@@ -13,12 +13,12 @@
 #define YOUR_SRAM_ADDR          0x80000
 
 //Change this to your local SW address
-//#define YOUR_SWITCHES_ADDR        0x2000  //Scott's
-#define YOUR_SWITCHES_ADDR      0x4010  //Amitoj's
+#define YOUR_SWITCHES_ADDR        0x2000  //Scott's
+//#define YOUR_SWITCHES_ADDR      0x4010  //Amitoj's
 
 //Change to your QSYS local name
-//#define YOUR_PIXEL_BUFFER_NAME    "/dev/video_pixel_buffer_dma_0"  //Scott's
-#define YOUR_PIXEL_BUFFER_NAME  "/dev/pixel_buffer_dma"  //Amitoj's
+#define YOUR_PIXEL_BUFFER_NAME    "/dev/video_pixel_buffer_dma_0"  //Scott's
+//#define YOUR_PIXEL_BUFFER_NAME  "/dev/pixel_buffer_dma"  //Amitoj's
 
 //Change to your QSYS local name
 #define YOUR_CHAR_BUFFER_NAME   "/dev/char_drawer"
@@ -61,32 +61,33 @@ int die();
 
     int issavegame = 0;
     int movement_matrix[10][16];
-    int time_var1 = 150;
+    int time_var1;
     background g[10][16];
     dir lastdir;
-    int frog_x = 120;
-    int frog_y = 216;
-    int lives_remaining = 3;
-    int time_var2 =0;
-    int truck_1 = 0;
-    int truck_2 = 160;
-    int car_1 = 20;
-    int car_2 = 120;
-    int car_3 = 220;
-    int car_4 = 50;
-    int car_5 = 150;
-    int car_6 = 250;
-    int log_1 = 20;
-    int log_2 = 100;
-    int log_3 = 50;
-    int log_4 = 150;
-    int log_5 = 70;
-    int log_6 = 200;
+    int frog_x;
+    int frog_y;
+    int lives_remaining;
+    int time_var2;
+    int truck_1;
+    int truck_2;
+    int car_1;
+    int car_2;
+    int car_3;
+    int car_4;
+    int car_5;
+    int car_6;
+    int log_1;
+    int log_2;
+    int log_3;
+    int log_4;
+    int log_5;
+    int log_6;
     char time_remaining[20];
     char time_r[5];
     char score[20];
     char temp_highscore[20];
     int highscore = 0;
+
 
 
 //-------------------------
@@ -360,8 +361,14 @@ void setup_level(){
         g[1][i] = WinBlock;
         g[2][i] = Water;
         g[3][i] = Water;
+        g[3][7] = Grass;
+        g[3][8] = Grass;
         g[4][i] = Water;
         g[5][i] = Grass;
+        g[5][0] = Water;
+        g[5][15] = Water;
+        g[5][7] = Water;
+        g[5][8] = Water;
         g[6][i] = Highway;
         g[7][i] = Highway;
         g[8][i] = Highway;
@@ -427,7 +434,7 @@ void loadgame(){
 }
 
 int checkwin(){
-   if (g[frog_y/24][frog_x/20] == WinBlock){
+   if (g[frog_y/(240/gridy)][frog_x/(320/gridx)] == WinBlock){
 	   if ((time_var1-90)*(lives_remaining) > highscore){
 		   highscore = (time_var1-90)*(lives_remaining);}
 	   return 1;
@@ -515,23 +522,23 @@ int mainrun(){
         printgrid();
         draw_topinfo();
 
-        truck_1 = draw_truck(truck_1, 192, 1);
-        truck_2 = draw_truck(truck_2, 192, 1);
-        car_1 = draw_car(car_1,  168, 0x267, -1);
-        car_2 = draw_car(car_2,  168, 0x234, -1);
-        car_3 = draw_car(car_3,  168, 0x533, -1);
-        car_4 = draw_car(car_4,  144, 0x867,  1);
-        car_5 = draw_car(car_5,  144, 0x165,  1);
-        car_6 = draw_car(car_6,  144, 0x378,  1);
-        log_1 = draw_log(log_1,  96,  0x5200,  3,  1);
-        log_2 = draw_log(log_2,  96,  0x5200,  2,  1);
-        log_3 = draw_log(log_3,  72,  0x5200,  3, -1);
-        log_4 = draw_log(log_4,  72,  0x5200,  2, -1);
-        log_5 = draw_log(log_5,  48,  0x5200,  3,  1);
-        log_6 = draw_log(log_6,  48,  0x5200,  3,  1);
+        truck_1 = draw_truck(truck_1, (240/gridy)*8, 1);
+        truck_2 = draw_truck(truck_2, (240/gridy)*8, 1);
+        car_1 	= draw_car(car_1,  (240/gridy)*7,  0x267, -1);
+        car_2 	= draw_car(car_2,  (240/gridy)*7,  0x234, -1);
+        car_3 	= draw_car(car_3,  (240/gridy)*7,  0x533, -1);
+        car_4 	= draw_car(car_4,  (240/gridy)*6,  0x867,  1);
+        car_5 	= draw_car(car_5,  (240/gridy)*6,  0x165,  1);
+        car_6 	= draw_car(car_6,  (240/gridy)*6,  0x378,  1);
+        log_1 	= draw_log(log_1,  (240/gridy)*4,  0x5200,  3,  1);
+        log_2 	= draw_log(log_2,  (240/gridy)*4,  0x5200,  2,  1);
+        log_3 	= draw_log(log_3,  (240/gridy)*3,  0x5200,  3, -1);
+        log_4 	= draw_log(log_4,  (240/gridy)*3,  0x5200,  2, -1);
+        log_5 	= draw_log(log_5,  (240/gridy)*2,  0x5200,  3,  1);
+        log_6 	= draw_log(log_6,  (240/gridy)*2,  0x5200,  3,  1);
 
 
-        //If the movment function returns a 1, that means user quit the game
+        //If the movement function returns a 1, that means user quit the game
         if ( draw_frogger() ) {
             alt_up_pixel_buffer_dma_swap_buffers(pixel_buffer);
             return 0;
@@ -541,10 +548,10 @@ int mainrun(){
         while (alt_up_pixel_buffer_dma_check_swap_buffers_status(pixel_buffer) != 0){};
 
 //START - Collision
-        if(movement_matrix[frog_y/24][frog_x/20] == 1 ){
+        if(movement_matrix[frog_y/(240/gridy)][frog_x/(320/gridx)] == 1 ){
             //alt_up_pixel_buffer_dma_clear_screen(pixel_buffer, 0);
-            frog_x = 120;
-            frog_y = 216;
+            frog_x = (320/gridx)*6;
+            frog_y = (240/gridy)*9;
             --lives_remaining;
             if(lives_remaining == 0){
                 die();
@@ -696,29 +703,28 @@ int pause(){
 int main(){
     initilize_vga();
     for(;;) {
-        menu();
-        frog_x = 120;
-        frog_y = 216;
-        lives_remaining = 3;
-        time_var1 = 150;
-        time_var2 =0;
-        truck_1 = 0;
-        truck_2 = 160;
-        car_1 = 20;
-        car_2 = 120;
-        car_3 = 220;
-        car_4 = 50;
-        car_5 = 150;
-        car_6 = 250;
-        log_1 = 20;
-		log_2 = 100;
-		log_3 = 50;
-		log_4 = 150;
-		log_5 = 70;
-		log_6 = 200;
 
-        // Clean up: put global variables back to starting values
-        // or else we restart the game dead
+    	frog_x = (320/gridx)*6;
+    	frog_y = (240/gridy)*9;
+    	lives_remaining = 3;
+    	time_var1 = 150;
+    	time_var2 =0;
+    	truck_1 = (320/gridx)*0;
+    	truck_2 = (320/gridx)*8;
+    	car_1 	= (320/gridx)*1;
+    	car_2 	= (320/gridx)*6;
+    	car_3 	= (320/gridx)*11;
+    	car_4 	= (320/gridx)*2.5;
+    	car_5 	= (320/gridx)*7.5;
+    	car_6 	= (320/gridx)*12.5;
+    	log_1 	= (320/gridx)*1;
+    	log_2 	= (320/gridx)*5;
+    	log_3 	= (320/gridx)*2.5;
+    	log_4 	= (320/gridx)*7.5;
+    	log_5 	= (320/gridx)*3.5;
+    	log_6 	= (320/gridx)*10;
+
+        menu();
     }
     return 0;
 }
