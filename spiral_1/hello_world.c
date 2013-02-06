@@ -25,27 +25,27 @@
 
 //Directions
 typedef enum { up, down, left, right, nodir, dpause } dir;
-
+typedef enum { truck, car, log } vehicle;
 //------------------------------------------------------
-
 
 
 
 //------------------------------------------------------
 // Level design
-typedef enum { NoBlock, Grass, Water, Highway, WinBlock } background;
+typedef enum { NoBlock, Grass, Water, Highway, WinBlock, Highway_t } background;
 #define c_NoBlock   0x0000
 #define c_Grass     0x0f00
 #define c_Water     0x00f0
 #define c_Highway   8 | (8 << 6) | (8 << 11)
 #define c_WinBlock  0x0f10
+#define c_Yellow	0xff00
 
-#define gridx 16
-#define gridy 10
+#define gridx 16 //16
+#define gridy 10 //10
 
 int pause();
 int win();
-int mainrun();
+int playgame();
 int die();
 //------------------------------------------------------
 
@@ -60,9 +60,9 @@ int die();
     alt_up_char_buffer_dev *char_buffer;
 
     int issavegame = 0;
-    int movement_matrix[10][16];
+    int movement_matrix[50][50];
     int time_var1;
-    background g[10][16];
+    background g[50][50];
     dir lastdir;
     int frog_x;
     int frog_y;
@@ -120,8 +120,8 @@ int die();
 
 void init_matrix(){
     int i, j = 0;
-    for (i=0; i<10; i++){
-        for (j=0; j<16; j++){
+    for (i=0; i<gridy; i++){
+        for (j=0; j<gridx; j++){
             movement_matrix[i][j] = 0;
         }
     }
@@ -349,6 +349,10 @@ void printgrid(){
                 alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(j), (240/gridy)*(i), (320/gridx)*(j+1), (240/gridy)*(i+1), c_Highway, 1);
             else if (g[i][j] == WinBlock)
                 alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(j), (240/gridy)*(i), (320/gridx)*(j+1), (240/gridy)*(i+1), c_WinBlock, 1);
+            else if (g[i][j] == Highway_t){
+                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(j), (240/gridy)*(i), (320/gridx)*(j+1), (240/gridy)*(i+1), c_Highway, 1);
+                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(j), (240/gridy)*(i), (320/gridx)*(j+1), (240/gridy)*(i)+1, c_Yellow, 1);
+            }
 
         }
     }
@@ -356,7 +360,7 @@ void printgrid(){
 
 void setup_level(){
     int i;
-    for ( i=0; i<16; i++ ){
+    for ( i=0; i<gridx; i++ ){
         g[0][i] = NoBlock;
         g[1][i] = WinBlock;
         g[2][i] = Water;
@@ -370,9 +374,14 @@ void setup_level(){
         g[5][7] = Water;
         g[5][8] = Water;
         g[6][i] = Highway;
-        g[7][i] = Highway;
-        g[8][i] = Highway;
+        if(i%2)	g[7][i] = Highway;
+        else	g[7][i] = Highway_t;
+        if(i%2)	g[8][i] = Highway;
+        else	g[8][i] = Highway_t;
         g[9][i] = Grass;
+        g[10][i] = Grass;
+        g[11][i] = Grass;
+        g[12][i] = Grass;
     }
 }
 
@@ -429,14 +438,12 @@ void loadgame(){
         log_5 = s_log_5;
         log_6 = s_log_6;
 
-        mainrun();
+        playgame();
     }
 }
 
 int checkwin(){
    if (g[frog_y/(240/gridy)][frog_x/(320/gridx)] == WinBlock){
-	   if ((time_var1-90)*(lives_remaining) > highscore){
-		   highscore = (time_var1-90)*(lives_remaining);}
 	   return 1;
    }
    else
@@ -475,17 +482,17 @@ int draw_frogger(){
     int p;
     dir mydir = getdir();
     if(mydir == up){
-        if(frog_y > 24){
-            frog_y = frog_y-24;}
+        if(frog_y > (240/gridy)){
+            frog_y = frog_y-(240/gridy);}
     }else if(mydir == down){
-        if(frog_y < 216){
-            frog_y = frog_y+24;}
+        if(frog_y < (240/gridy)*(gridy-1)){
+            frog_y = frog_y+(240/gridy);}
     }else if(mydir == right){
-        if(frog_x < 300){
-            frog_x = frog_x+20;}
+        if(frog_x < (320/gridx)*(gridx-1)){
+            frog_x = frog_x+(320/gridx);}
     }else if(mydir == left){
         if(frog_x > 0){
-            frog_x = frog_x-20;}
+            frog_x = frog_x-(320/gridx);}
     }else if (mydir == dpause){
         p = pause();
         if (p == 0) return 0;
@@ -495,7 +502,7 @@ int draw_frogger(){
             return 1;
         }
     }
-    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x,    frog_y,   frog_x+20, frog_y+23, 0xF000, 1);
+    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x,    frog_y,   frog_x+(320/gridx), frog_y+(240/gridy)-1, 0xF000, 1);
     alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x+2,  frog_y+4, frog_x+7,  frog_y+6,  0x0000, 1);
     alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x+13, frog_y+4, frog_x+18, frog_y+6,  0x0000, 1);
 
@@ -505,11 +512,9 @@ int draw_frogger(){
 
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-int mainrun(){
+int playgame(){
 
-//Initilize Variables
-
-
+//Initialize Variables
     alt_up_pixel_buffer_dma_clear_screen(pixel_buffer, 0);
 
     setup_level();
@@ -518,24 +523,23 @@ int mainrun(){
 
         init_matrix();
 
-        //draw_background();
         printgrid();
         draw_topinfo();
 
         truck_1 = draw_truck(truck_1, (240/gridy)*8, 1);
         truck_2 = draw_truck(truck_2, (240/gridy)*8, 1);
-        car_1 	= draw_car(car_1,  (240/gridy)*7,  0x267, -1);
-        car_2 	= draw_car(car_2,  (240/gridy)*7,  0x234, -1);
-        car_3 	= draw_car(car_3,  (240/gridy)*7,  0x533, -1);
-        car_4 	= draw_car(car_4,  (240/gridy)*6,  0x867,  1);
-        car_5 	= draw_car(car_5,  (240/gridy)*6,  0x165,  1);
-        car_6 	= draw_car(car_6,  (240/gridy)*6,  0x378,  1);
-        log_1 	= draw_log(log_1,  (240/gridy)*4,  0x5200,  3,  1);
-        log_2 	= draw_log(log_2,  (240/gridy)*4,  0x5200,  2,  1);
-        log_3 	= draw_log(log_3,  (240/gridy)*3,  0x5200,  3, -1);
-        log_4 	= draw_log(log_4,  (240/gridy)*3,  0x5200,  2, -1);
-        log_5 	= draw_log(log_5,  (240/gridy)*2,  0x5200,  3,  1);
-        log_6 	= draw_log(log_6,  (240/gridy)*2,  0x5200,  3,  1);
+        car_1 	= draw_car	(car_1,   (240/gridy)*7,  0x267, -1);
+        car_2 	= draw_car	(car_2,   (240/gridy)*7,  0x234, -1);
+        car_3 	= draw_car	(car_3,   (240/gridy)*7,  0x533, -1);
+        car_4 	= draw_car	(car_4,   (240/gridy)*6,  0x867,  1);
+        car_5 	= draw_car	(car_5,   (240/gridy)*6,  0x165,  1);
+        car_6 	= draw_car	(car_6,   (240/gridy)*6,  0x378,  1);
+        log_1 	= draw_log	(log_1,   (240/gridy)*4,  0x5200,  3,  1);
+        log_2 	= draw_log	(log_2,   (240/gridy)*4,  0x5200,  2,  1);
+        log_3 	= draw_log	(log_3,   (240/gridy)*3,  0x5200,  3, -1);
+        log_4 	= draw_log	(log_4,   (240/gridy)*3,  0x5200,  2, -1);
+        log_5 	= draw_log	(log_5,   (240/gridy)*2,  0x5200,  3,  1);
+        log_6 	= draw_log	(log_6,   (240/gridy)*2,  0x5200,  3,  1);
 
 
         //If the movement function returns a 1, that means user quit the game
@@ -549,7 +553,6 @@ int mainrun(){
 
 //START - Collision
         if(movement_matrix[frog_y/(240/gridy)][frog_x/(320/gridx)] == 1 ){
-            //alt_up_pixel_buffer_dma_clear_screen(pixel_buffer, 0);
             frog_x = (320/gridx)*6;
             frog_y = (240/gridy)*9;
             --lives_remaining;
@@ -561,7 +564,9 @@ int mainrun(){
 
         if ( checkwin() ) {
             win();
-            //save score
+            if ((time_var1-90)*(lives_remaining) > highscore){
+            	highscore = (time_var1-90)*(lives_remaining);
+            }
             return 0;
         }
 
@@ -648,7 +653,7 @@ int menu(){
         else if (mydir == left || mydir == right){
             if (sel%3 == 0){
                 alt_up_char_buffer_clear(char_buffer);
-                mainrun();
+                playgame();
             }else if (sel%3 == 1){
                 alt_up_char_buffer_clear(char_buffer);
                 highscores();
