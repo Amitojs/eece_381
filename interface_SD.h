@@ -14,11 +14,20 @@
 
 #include <stdio.h>
 
+
+//prototype for initialization of the SD card
+void sd_init(void);
 //prototype for file reader.
 int file_read(char*, char*, int);
 //Prototype for the filename reader.
 int filenames_read(char*, int);
 //prototype for level data
 void level_data(char*, char*, char*);
+//prototype for saving the gamestate
+void level_save(char*, char*);
+//prototype for loading the gamestate
+void level_load(char*, char*);
+//prototype for getting level names
+int levelnames(char* levelmatrix);
 
 #endif /* SD_INTERFACE_H_ */

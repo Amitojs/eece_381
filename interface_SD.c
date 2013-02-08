@@ -44,6 +44,12 @@
 	int charcount=0;
  *  charcount = file_read(charptr, "README.TXT", charbuffersize);
  */
+void sd_init(void){
+
+	alt_up_sd_card_dev *device_reference = NULL;
+	device_reference = alt_up_sd_card_open_dev("/dev/Altera_UP_SD_Card_Avalon_Interface_0");
+}
+
 int file_read(char* charbuffer, char* filename, int charmax){
 
 
@@ -87,7 +93,7 @@ int file_read(char* charbuffer, char* filename, int charmax){
 		}
 
 	}
-
+	return -1;
 
 }
 
@@ -119,6 +125,9 @@ int filenames_read(char* filename, int charmax){
 			int filecount = 0;
 
 			int returnval = alt_up_sd_card_find_first(0x0, filename);
+			if (returnval < 0){
+				printf("the read failed");
+			}
 
 			/*
 			 * Read the first filename within the SD card as long as there is sufficient space within the character buffer
@@ -166,7 +175,42 @@ int filenames_read(char* filename, int charmax){
 
 }
 
+/*
+ * Requires a pointer to a matrix in the format levelmatrix [n][6] where n is an integer
+ * stores the filenames, one per line, 6 characters for every name
+ * returns the number of levels stored on the SD card
+ */
+int levelnames(char* levelmatrix){
 
+	char filenames[1024];
+	char* files;
+	int lvlcount = 0;
+	files = &filenames[0];
+	int filecount = filenames_read(filenames, 1024);
+	int count = 0;
+	while (count < filecount){
+
+		if(*files == '.')
+			count++;
+		if(*files == 'L' && *(files+1) == '_'){
+			lvlcount++;
+			files +=2;
+			int i = 0;
+			while(*files != '.'){
+				*(levelmatrix+i) = *files;
+
+				files++;
+				i++;
+			}
+			levelmatrix += 6;
+
+		}
+		files++;
+
+	}
+	return lvlcount;
+
+}
 /*
  * This function adds the leveldata from a text file into a 10 character buffer for storing the level data
  * This function takes two arguments, the filename and a pointer to the beginning of the
@@ -186,28 +230,50 @@ void level_data(char* filename, char* levelbuffer, char* objectbuffer){
 
 	char data[1024];
 	char* dataptr;
+	int width;
+	int height;
 	int k;
 	int j;
 	dataptr = &data[0];
 
 	file_read(dataptr, filename, 1024);
 
+	//Search for the beginning of leveldata marker '*' and then read the data into the array.
+	while (*dataptr != '^')
+		dataptr++;
+	dataptr++;
+	if(*dataptr == 'S'){
+		width = 16;
+		height = 10;
+	}
+	else if(*dataptr == 'M'){
+		width = 20;
+		height = 16;
+	}
+	else{
+		width = 32;
+		height = 24;
+	}
+
+
+
 	while (*dataptr != '*')
 		dataptr++;
 	dataptr++;
-	for(k=0; k<10; k++){
-		for(j=0;j<16;j++){
+	for(k=0; k<height; k++){
+		for(j=0;j<width;j++){
 			*levelbuffer = *dataptr;
 			levelbuffer++;
 			dataptr++;
 		}
 	}
+	//Search for the beginning of objectdata marker '$' and then read the following data into the array
 
 	while (*dataptr != '$')
 		dataptr++;
 	dataptr++;
-	for(k=0; k<10; k++){
-		for(j=0;j<16;j++){
+	for(k=0; k<height; k++){
+		for(j=0;j<width;j++){
 			*objectbuffer = *dataptr;
 			objectbuffer++;
 			dataptr++;
@@ -216,3 +282,32 @@ void level_data(char* filename, char* levelbuffer, char* objectbuffer){
 
 }
 
+void level_save(char* levelbuffer, char* objectbuffer){
+	if ((alt_up_sd_card_is_Present())) {
+		if (alt_up_sd_card_is_FAT16()) {
+
+			short int save;
+			int k;
+
+			//Open the file in the argument for reading. If no save exists, create it.
+			save = alt_up_sd_card_fopen("save.txt", true);
+			alt_up_sd_card_write(save, '*');
+			for (k=0;k<320;k++){
+				alt_up_sd_card_write(save, *levelbuffer);
+				levelbuffer++;
+			}
+			alt_up_sd_card_write(save, '$');
+			for (k=0;k<320;k++){
+				alt_up_sd_card_write(save, *objectbuffer);
+				objectbuffer++;
+			}
+			alt_up_sd_card_fclose(save);
+			return;
+
+		}
+	}
+}
+
+void level_load(char* levelbuffer, char* objectbuffer){
+	level_data("playersave.txt",levelbuffer,objectbuffer);
+}
