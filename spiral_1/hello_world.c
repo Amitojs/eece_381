@@ -7,25 +7,8 @@
 
 
 //------------------------------------------------------
-// Local NIOS numbers:
-
-//Change this in your local S ram address in QSYS
-#define YOUR_SRAM_ADDR          0x80000
-
-//Change this to your local SW address
-#define YOUR_SWITCHES_ADDR        0x2000  //Scott's
-//#define YOUR_SWITCHES_ADDR      0x4010  //Amitoj's
-
-//Change to your QSYS local name
-#define YOUR_PIXEL_BUFFER_NAME    "/dev/video_pixel_buffer_dma_0"  //Scott's
-//#define YOUR_PIXEL_BUFFER_NAME  "/dev/pixel_buffer_dma"  //Amitoj's
-
-//Change to your QSYS local name
-#define YOUR_CHAR_BUFFER_NAME   "/dev/char_drawer"
-
 //Directions
 typedef enum { up, down, left, right, nodir, dpause } dir;
-typedef enum { truck, car, log } vehicle;
 //------------------------------------------------------
 
 
@@ -39,9 +22,6 @@ typedef enum { NoBlock, Grass, Water, Highway, WinBlock, Highway_t } background;
 #define c_Highway   8 | (8 << 6) | (8 << 11)
 #define c_WinBlock  0x0f10
 #define c_Yellow	0xff00
-
-#define gridx 16 //16
-#define gridy 10 //10
 
 int pause();
 int win();
@@ -60,26 +40,13 @@ int die();
     alt_up_char_buffer_dev *char_buffer;
 
     int issavegame = 0;
-    int movement_matrix[50][50];
-    int time_var1;
     background g[50][50];
     dir lastdir;
-    int frog_x;
-    int frog_y;
-    int lives_remaining;
-    int time_var2;
-    int truck_1,truck_2;
 
     char time_remaining[20];
     char time_r[5];
     char score[20];
     char temp_highscore[20];
-    int highscore = 0;
-
-#define numcars 6
-    int cars[numcars];
-#define numlogs 6
-    int logs[numlogs];
 
 
 //-------------------------
@@ -108,38 +75,6 @@ void init_matrix(){
         }
     }
 }
-
-void initilize_vga(){
-    // Use the name of your pixel buffer DMA core
-    pixel_buffer = alt_up_pixel_buffer_dma_open_dev(YOUR_PIXEL_BUFFER_NAME);
-
-    unsigned int pixel_buffer_addr1 = YOUR_SRAM_ADDR;
-    unsigned int pixel_buffer_addr2 = YOUR_SRAM_ADDR + (320 * 240 * 2);
-
-    // Set the 1st buffer address
-    alt_up_pixel_buffer_dma_change_back_buffer_address(pixel_buffer, pixel_buffer_addr1);
-
-    // Swap buffers – we have to swap because there is only an API function
-    // to set the address of the background buffer.
-    alt_up_pixel_buffer_dma_swap_buffers(pixel_buffer);
-    while (alt_up_pixel_buffer_dma_check_swap_buffers_status(pixel_buffer));
-
-    // Set the 2nd buffer address
-    alt_up_pixel_buffer_dma_change_back_buffer_address(pixel_buffer, pixel_buffer_addr2);
-
-    // Clear both buffers (this makes all pixels black)
-    alt_up_pixel_buffer_dma_clear_screen(pixel_buffer, 0);
-    alt_up_pixel_buffer_dma_clear_screen(pixel_buffer, 1);
-
-    // Initialize
-    char_buffer = alt_up_char_buffer_open_dev(YOUR_CHAR_BUFFER_NAME);
-    alt_up_char_buffer_init(char_buffer);
-
-    // Clear the screen
-    alt_up_pixel_buffer_dma_clear_screen(pixel_buffer, 0);
-    alt_up_char_buffer_clear(char_buffer);
-}
-
 
 void draw_topinfo(){
     if((time_var1 - 90) >= 10){
@@ -185,83 +120,7 @@ void draw_topinfo(){
 }
 
 
-int draw_vehicle(vehicle myvehicle, int x_location, int y_location, int colour, int size, int direction, int speed){
-	int colour_2;
-	int colour_3;
 
-	if (myvehicle == truck){
-		colour_2 = 0xFFFF;  //Making Trailer of Truck White
-		colour_3 = 0xFFFF;	//Making Trailer of Truck White
-	}else{
-		colour_2 = colour;
-		colour_3 = colour;
-	}
-
-    switch(direction){
-        case 1:
-            if(x_location>= (320/gridx)){
-                    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-(320/gridx), y_location, x_location, y_location+(240/gridy) - 1, colour, 1);
-            }else{
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location, y_location+(240/gridy) - 1, colour, 1);
-            }
-            if(x_location>= 40){
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-40, y_location, x_location-(320/gridx), y_location+(240/gridy) - 1, colour_2, 1);
-            }else if(x_location> (320/gridx) && x_location< 40){
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location-(320/gridx), y_location+(240/gridy) - 1, colour_2, 1);
-            }
-            if (x_location >= 60 && size == 3){
-            	alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-60, y_location, x_location-40, y_location+(240/gridy) - 1, colour_3, 1);
-            }else if(x_location > 40 && x_location < 60 && size == 3){
-            	alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location-40, y_location+(240/gridy) - 1, colour_3, 1);
-            }
-
-            x_location=x_location+speed;
-            if(x_location >= (320/gridx)*(gridx+3)){x_location=0;}
-            if (myvehicle == log){
-				movement_matrix[y_location/(240/gridy)][(x_location)/(320/gridx)] = -1;
-				if (x_location >= (320/gridx)){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = -1;}
-				if (x_location >= (320/gridx)*2){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx)*2)/(320/gridx)] = -1;}
-				if (x_location >= (320/gridx)*3 && size == 3){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx)*3)/(320/gridx)] = -1;}
-            }else{
-            	movement_matrix[y_location/(240/gridy)][(x_location)/(320/gridx)] = 1;
-				if (x_location >= (320/gridx)){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = 1;}
-				if (x_location >= (320/gridx)*2){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx)*2)/(320/gridx)] = 1;}
-				if (x_location >= (320/gridx)*3 && size == 3){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx)*3)/(320/gridx)] = 1;}
-
-            }
-            break;
-        default:
-            if(x_location >= (320/gridx)){
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-(320/gridx), y_location, x_location, y_location+(240/gridy) - 1, colour, 1);
-            }else{
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location, y_location+(240/gridy) - 1, colour, 1);
-            }
-            if(x_location >= (320/gridx)*2){
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-(320/gridx)*2, y_location, x_location-(320/gridx), y_location+(240/gridy) - 1, colour_2, 1);
-            }else if(x_location > (320/gridx) && x_location < (320/gridx)*2){
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location-(320/gridx), y_location+(240/gridy) - 1, colour_2, 1);
-            }
-            if(x_location >= (320/gridx)*3 && size == 3){
-				 alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-(320/gridx)*3, y_location, x_location-(320/gridx)*2, y_location+(240/gridy) - 1, colour_3, 1);
-			 }else if(x_location > (320/gridx)*2 && x_location < (320/gridx)*3 && size == 3){
-				 alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location-(320/gridx)*2, y_location+(240/gridy) - 1, colour_3, 1);
-			 }
-            x_location=x_location-speed;
-            if(x_location <= 0){x_location=(320/gridx)*(gridx+2);}
-            if (myvehicle == log){
-            movement_matrix[y_location/(240/gridy)][(x_location)/(320/gridx)] = 0;
-				if (x_location>= (320/gridx)){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = -2;}
-				if (x_location>= (320/gridx)*2){movement_matrix[y_location/(240/gridy)][(x_location-((320/gridx)*2))/(320/gridx)] = -2;}
-				if (x_location>= (320/gridx)*3 && size == 3){movement_matrix[y_location/(240/gridy)][(x_location-((320/gridx)*3))/(320/gridx)] = -2;}
-            }else{
-            	if (x_location>= (320/gridx)){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = 1;}
-				if (x_location>= (320/gridx)*2){movement_matrix[y_location/(240/gridy)][(x_location-((320/gridx)*2))/(320/gridx)] = 1;}
-				if (x_location>= (320/gridx)*3 && size == 3){movement_matrix[y_location/(240/gridy)][(x_location-((320/gridx)*3))/(320/gridx)] = 1;}
-            }
-            break;
-    	}
-    return x_location;
-}
 
 
 void printgrid(){
@@ -436,90 +295,7 @@ int draw_frogger(){
 
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-int playgame(){
 
-//Initialize Variables
-    alt_up_pixel_buffer_dma_clear_screen(pixel_buffer, 0);
-
-    setup_level();
-
-    while(1){
-
-        init_matrix();
-
-        printgrid();
-        draw_topinfo();
-
-        truck_1 = draw_vehicle(truck, truck_1, (240/gridy)*8, 0x678,  3,  1, 1);
-        truck_2 = draw_vehicle(truck, truck_2, (240/gridy)*8, 0x534,  3,  1, 1);
-
-        cars[0] = draw_vehicle(car,   cars[0],   (240/gridy)*7, 0x267,  2, -1, 2);
-        cars[1] = draw_vehicle(car,   cars[1],   (240/gridy)*7, 0x234,  2, -1, 2);
-        cars[2] = draw_vehicle(car,   cars[2],   (240/gridy)*7, 0x533,  2, -1, 2);
-        cars[3] = draw_vehicle(car,   cars[3],   (240/gridy)*6, 0x867,  2,  1, 2);
-        cars[4] = draw_vehicle(car,   cars[4],   (240/gridy)*6, 0x165,  2,  1, 2);
-        cars[5] = draw_vehicle(car,   cars[5],   (240/gridy)*6, 0x378,  2,  1, 2);
-
-        logs[0]	= draw_vehicle(log,   logs[0],   (240/gridy)*4, 0x5200,  3,   1, 1);
-        logs[1]	= draw_vehicle(log,   logs[1],   (240/gridy)*4, 0x5200,  2,   1, 1);
-        logs[2]	= draw_vehicle(log,   logs[2],   (240/gridy)*3, 0x5200,  3,  -1, 1);
-        logs[3]	= draw_vehicle(log,   logs[3],   (240/gridy)*3, 0x5200,  2,  -1, 1);
-        logs[4]	= draw_vehicle(log,   logs[4],   (240/gridy)*2, 0x5200,  3,   1, 1);
-        logs[5]	= draw_vehicle(log,   logs[5],   (240/gridy)*2, 0x5200,  3,   1, 1);
-
-
-
-
-        //If the movement function returns a 1, that means user quit the game
-        if ( draw_frogger() ) {
-            alt_up_pixel_buffer_dma_swap_buffers(pixel_buffer);
-            return 0;
-        }
-
-        while (alt_up_pixel_buffer_dma_swap_buffers(pixel_buffer) != 0){};
-        while (alt_up_pixel_buffer_dma_check_swap_buffers_status(pixel_buffer) != 0){};
-
-//START - Collision
-        if(movement_matrix[frog_y/(240/gridy)][frog_x/(320/gridx)] == 1 ){
-            frog_x = (320/gridx)*6;
-            frog_y = (240/gridy)*9;
-            --lives_remaining;
-            if(lives_remaining == 0){
-                die();
-                return 0;}
-        }else if (movement_matrix[frog_y/(240/gridy)][frog_x/(320/gridx)] == -1 ){
-        	if (frog_x < (320/gridx)*(gridx-1) )
-        		frog_x++;
-        }else if (movement_matrix[frog_y/(240/gridy)][frog_x/(320/gridx)] == -2 ){
-        	if (frog_x > 0 )
-        		frog_x--;
-        }
-//FINISH - Collision
-
-        if ( checkwin() ) {
-            win();
-            if ((time_var1-90)*(lives_remaining) > highscore){
-            	highscore = (time_var1-90)*(lives_remaining);
-            }
-            return 0;
-        }
-
-//Time
-        if (time_var2 <= 15){
-            ++time_var2;
-            if (time_var2 >=15 && time_var1 >= 90){
-                --time_var1;
-                if (time_var1 <= 90){
-                	die();
-                	return 0;
-                }
-                time_var2=0;
-            }
-        }
-
-    }
-    return 0;
-}
 
 int highscores(){
     int i;

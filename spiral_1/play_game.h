@@ -23,10 +23,11 @@ int lives_remaining;
 int highscore = 0;
 
 int truck_1,truck_2;
-int log_1,	log_2,	log_3,	log_4,	log_5,	log_6;
 
 #define numcars 6
     int cars[numcars];
+#define numlogs 6
+    int logs[numlogs];
 
 //------------------------------------------------------
 
@@ -55,12 +56,12 @@ int playgame(){
         cars[4] = draw_vehicle(car,   cars[4],   (240/gridy)*6, 0x165,  2,  1, 2);
         cars[5] = draw_vehicle(car,   cars[5],   (240/gridy)*6, 0x378,  2,  1, 2);
 
-        log_1 	= draw_vehicle(log,   log_1,   (240/gridy)*4, 0x5200,  3,   1, 1);
-        log_2 	= draw_vehicle(log,   log_2,   (240/gridy)*4, 0x5200,  2,   1, 1);
-        log_3 	= draw_vehicle(log,   log_3,   (240/gridy)*3, 0x5200,  3,  -1, 1);
-        log_4 	= draw_vehicle(log,   log_4,   (240/gridy)*3, 0x5200,  2,  -1, 1);
-        log_5 	= draw_vehicle(log,   log_5,   (240/gridy)*2, 0x5200,  3,   1, 1);
-        log_6 	= draw_vehicle(log,   log_6,   (240/gridy)*2, 0x5200,  3,   1, 1);
+        logs[0]	= draw_vehicle(log,   logs[0],   (240/gridy)*4, 0x5200,  3,   1, 1);
+        logs[1]	= draw_vehicle(log,   logs[1],   (240/gridy)*4, 0x5200,  2,   1, 1);
+        logs[2]	= draw_vehicle(log,   logs[2],   (240/gridy)*3, 0x5200,  3,  -1, 1);
+        logs[3]	= draw_vehicle(log,   logs[3],   (240/gridy)*3, 0x5200,  2,  -1, 1);
+        logs[4]	= draw_vehicle(log,   logs[4],   (240/gridy)*2, 0x5200,  3,   1, 1);
+        logs[5]	= draw_vehicle(log,   logs[5],   (240/gridy)*2, 0x5200,  3,   1, 1);
 
 
 
@@ -82,6 +83,12 @@ int playgame(){
             if(lives_remaining == 0){
                 die();
                 return 0;}
+        }else if (movement_matrix[frog_y/(240/gridy)][frog_x/(320/gridx)] == -1 ){
+        	if (frog_x < (320/gridx)*(gridx-1) )
+        		frog_x++;
+        }else if (movement_matrix[frog_y/(240/gridy)][frog_x/(320/gridx)] == -2 ){
+        	if (frog_x > 0 )
+        		frog_x--;
         }
 //FINISH - Collision
 
