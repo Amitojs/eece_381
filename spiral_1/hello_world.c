@@ -70,7 +70,7 @@ int die();
     int time_var2;
     int truck_1,truck_2;
     //int car_1,	car_2,	car_3,	car_4,	car_5,	car_6;
-    int log_1,	log_2,	log_3,	log_4,	log_5,	log_6;
+    //int log_1,	log_2,	log_3,	log_4,	log_5,	log_6;
     char time_remaining[20];
     char time_r[5];
     char score[20];
@@ -79,6 +79,8 @@ int die();
 
 #define numcars 6
     int cars[numcars];
+#define numlogs 6
+    int logs[numlogs];
 
 
 //-------------------------
@@ -91,9 +93,10 @@ int die();
     int s_time_var2;
     int s_truck_1,	s_truck_2;
     //int s_car_1,	s_car_2,	s_car_3,	s_car_4,	s_car_5,	s_car_6;
-    int s_log_1,	s_log_2,	s_log_3,	s_log_4,	s_log_5,	s_log_6;
+    //int s_log_1,	s_log_2,	s_log_3,	s_log_4,	s_log_5,	s_log_6;
 
     int s_cars[numcars];
+	int s_logs[numlogs];
 
 //------------------------------------------------------
 
@@ -326,19 +329,16 @@ void savegame(){
     s_frog_y = frog_y;
     s_lives_remaining = lives_remaining;
     s_time_var2 = time_var2;
+	
     s_truck_1 = truck_1;
     s_truck_2 = truck_2;
 
     for (i = 0; i <= numcars; i++){
     	s_cars[i] = cars[i];
     }
-
-    s_log_1 = log_1;
-	s_log_2 = log_2;
-	s_log_3 = log_3;
-	s_log_4 = log_4;
-	s_log_5 = log_5;
-	s_log_6 = log_6;
+	for (i = 0; i <= numlogs; i++){
+    	s_logs[i] = logs[i];
+    }
 }
 
 void loadgame(){
@@ -360,14 +360,11 @@ void loadgame(){
 
         for (i = 0; i <= numcars; i++){
             cars[i] = s_cars[i];
-          }
+        }
 
-        log_1 = s_log_1;
-        log_2 = s_log_2;
-        log_3 = s_log_3;
-        log_4 = s_log_4;
-        log_5 = s_log_5;
-        log_6 = s_log_6;
+        for (i = 0; i <= numlogs; i++){
+            logs[i] = s_logs[i];
+        }
 
         playgame();
     }
@@ -467,12 +464,12 @@ int playgame(){
         cars[4] = draw_vehicle(car,   cars[4],   (240/gridy)*6, 0x165,  2,  1, 2);
         cars[5] = draw_vehicle(car,   cars[5],   (240/gridy)*6, 0x378,  2,  1, 2);
 
-        log_1 	= draw_vehicle(log,   log_1,   (240/gridy)*4, 0x5200,  3,   1, 1);
-        log_2 	= draw_vehicle(log,   log_2,   (240/gridy)*4, 0x5200,  2,   1, 1);
-        log_3 	= draw_vehicle(log,   log_3,   (240/gridy)*3, 0x5200,  3,  -1, 1);
-        log_4 	= draw_vehicle(log,   log_4,   (240/gridy)*3, 0x5200,  2,  -1, 1);
-        log_5 	= draw_vehicle(log,   log_5,   (240/gridy)*2, 0x5200,  3,   1, 1);
-        log_6 	= draw_vehicle(log,   log_6,   (240/gridy)*2, 0x5200,  3,   1, 1);
+        logs[0]	= draw_vehicle(log,   logs[0],   (240/gridy)*4, 0x5200,  3,   1, 1);
+        logs[1]	= draw_vehicle(log,   logs[1],   (240/gridy)*4, 0x5200,  2,   1, 1);
+        logs[2]	= draw_vehicle(log,   logs[2],   (240/gridy)*3, 0x5200,  3,  -1, 1);
+        logs[3]	= draw_vehicle(log,   logs[3],   (240/gridy)*3, 0x5200,  2,  -1, 1);
+        logs[4]	= draw_vehicle(log,   logs[4],   (240/gridy)*2, 0x5200,  3,   1, 1);
+        logs[5]	= draw_vehicle(log,   logs[5],   (240/gridy)*2, 0x5200,  3,   1, 1);
 
 
 
@@ -659,12 +656,12 @@ int main(){
     	cars[4] = (320/gridx)*7.5;
     	cars[5] = (320/gridx)*12.5;
 
-    	log_1 	= (320/gridx)*1;
-    	log_2 	= (320/gridx)*5;
-    	log_3 	= (320/gridx)*2.5;
-    	log_4 	= (320/gridx)*7.5;
-    	log_5 	= (320/gridx)*3.5;
-    	log_6 	= (320/gridx)*10;
+    	logs[0]	= (320/gridx)*1;
+    	logs[1]	= (320/gridx)*5;
+    	logs[2]	= (320/gridx)*2.5;
+    	logs[3]	= (320/gridx)*7.5;
+    	logs[4]	= (320/gridx)*3.5;
+    	logs[5]	= (320/gridx)*10;
 
         menu();
     }
