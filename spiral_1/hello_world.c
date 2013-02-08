@@ -69,8 +69,7 @@ int die();
     int lives_remaining;
     int time_var2;
     int truck_1,truck_2;
-    //int car_1,	car_2,	car_3,	car_4,	car_5,	car_6;
-    //int log_1,	log_2,	log_3,	log_4,	log_5,	log_6;
+
     char time_remaining[20];
     char time_r[5];
     char score[20];
@@ -92,8 +91,6 @@ int die();
     int s_lives_remaining;
     int s_time_var2;
     int s_truck_1,	s_truck_2;
-    //int s_car_1,	s_car_2,	s_car_3,	s_car_4,	s_car_5,	s_car_6;
-    //int s_log_1,	s_log_2,	s_log_3,	s_log_4,	s_log_5,	s_log_6;
 
     int s_cars[numcars];
 	int s_logs[numlogs];
@@ -221,10 +218,10 @@ int draw_vehicle(vehicle myvehicle, int x_location, int y_location, int colour, 
             x_location=x_location+speed;
             if(x_location >= (320/gridx)*(gridx+3)){x_location=0;}
             if (myvehicle == log){
-				movement_matrix[y_location/(240/gridy)][(x_location)/(320/gridx)] = 0;
-				if (x_location >= (320/gridx)){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = 0;}
-				if (x_location >= (320/gridx)*2){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx)*2)/(320/gridx)] = 0;}
-				if (x_location >= (320/gridx)*3 && size == 3){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx)*3)/(320/gridx)] = 0;}
+				movement_matrix[y_location/(240/gridy)][(x_location)/(320/gridx)] = -1;
+				if (x_location >= (320/gridx)){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = -1;}
+				if (x_location >= (320/gridx)*2){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx)*2)/(320/gridx)] = -1;}
+				if (x_location >= (320/gridx)*3 && size == 3){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx)*3)/(320/gridx)] = -1;}
             }else{
             	movement_matrix[y_location/(240/gridy)][(x_location)/(320/gridx)] = 1;
 				if (x_location >= (320/gridx)){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = 1;}
@@ -253,9 +250,9 @@ int draw_vehicle(vehicle myvehicle, int x_location, int y_location, int colour, 
             if(x_location <= 0){x_location=(320/gridx)*(gridx+2);}
             if (myvehicle == log){
             movement_matrix[y_location/(240/gridy)][(x_location)/(320/gridx)] = 0;
-				if (x_location>= (320/gridx)){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = 0;}
-				if (x_location>= (320/gridx)*2){movement_matrix[y_location/(240/gridy)][(x_location-((320/gridx)*2))/(320/gridx)] = 0;}
-				if (x_location>= (320/gridx)*3 && size == 3){movement_matrix[y_location/(240/gridy)][(x_location-((320/gridx)*3))/(320/gridx)] = 0;}
+				if (x_location>= (320/gridx)){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = -2;}
+				if (x_location>= (320/gridx)*2){movement_matrix[y_location/(240/gridy)][(x_location-((320/gridx)*2))/(320/gridx)] = -2;}
+				if (x_location>= (320/gridx)*3 && size == 3){movement_matrix[y_location/(240/gridy)][(x_location-((320/gridx)*3))/(320/gridx)] = -2;}
             }else{
             	if (x_location>= (320/gridx)){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = 1;}
 				if (x_location>= (320/gridx)*2){movement_matrix[y_location/(240/gridy)][(x_location-((320/gridx)*2))/(320/gridx)] = 1;}
@@ -298,21 +295,25 @@ void setup_level(){
     for ( i=0; i<gridx; i++ ){
         g[0][i] = NoBlock;
         g[1][i] = WinBlock;
+
         g[2][i] = Water;
         g[3][i] = Water;
-        	//g[3][7] = Grass;
-        	//g[3][8] = Grass;
         g[4][i] = Water;
+
         g[5][i] = Grass;
         	g[5][0] = Water;
         	g[5][gridx-1] = Water;
-        	//g[5][7] = Water;
-        	//g[5][8] = Water;
         g[6][i] = Highway;
-        	if(i%2)	g[7][i] = Highway;
-        	else	g[7][i] = Highway_t;
-        	if(i%2)	g[8][i] = Highway;
-        	else	g[8][i] = Highway_t;
+
+        	if(i%2){
+        		g[7][i] = Highway;
+        		g[8][i] = Highway;
+        	}
+        	else{
+        		g[7][i] = Highway_t;
+        		g[8][i] = Highway_t;
+        	}
+
         g[9][i] = Grass;
         g[10][i] = Grass;
         g[11][i] = Grass;
@@ -329,7 +330,7 @@ void savegame(){
     s_frog_y = frog_y;
     s_lives_remaining = lives_remaining;
     s_time_var2 = time_var2;
-	
+
     s_truck_1 = truck_1;
     s_truck_2 = truck_2;
 
@@ -385,25 +386,20 @@ int swfinder(){
 dir getdir(){
     if       (swfinder() == 0){
         lastdir = nodir;
-        return nodir;
     }else if (swfinder() == 1 && lastdir == nodir){
         lastdir = down;
-        return down;
     }else if (swfinder() == 2 && lastdir == nodir){
         lastdir = up;
-        return up;
     }else if (swfinder() == 4 && lastdir == nodir){
         lastdir = right;
-        return right;
     }else if (swfinder() == 8 && lastdir == nodir){
         lastdir = left;
-        return left;
     }else if (swfinder() == 16){
         lastdir = dpause;
-        return dpause;
     }else{
-        return nodir;
+    	return nodir;
     }
+    return lastdir;
 }
 
 int draw_frogger(){
@@ -491,6 +487,12 @@ int playgame(){
             if(lives_remaining == 0){
                 die();
                 return 0;}
+        }else if (movement_matrix[frog_y/(240/gridy)][frog_x/(320/gridx)] == -1 ){
+        	if (frog_x < (320/gridx)*(gridx-1) )
+        		frog_x++;
+        }else if (movement_matrix[frog_y/(240/gridy)][frog_x/(320/gridx)] == -2 ){
+        	if (frog_x > 0 )
+        		frog_x--;
         }
 //FINISH - Collision
 
