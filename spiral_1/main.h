@@ -6,13 +6,14 @@
 //Directions
 typedef enum { up, down, left, right, nodir, dpause } dir;
 //------------------------------------------------------
+typedef enum { NoBlock, Grass, Water, Highway, WinBlock, Highway_t } background;
+background g[50][50];
 
 char score[20];
 char temp_highscore[20];
 
 void setup_level();
 void init_matrix();
-void init_variables();
 void draw_topinfo();
 int pause();
 int win();
@@ -27,7 +28,6 @@ dir getdir();
 int draw_frogger();
 int highscores();
 int menu();
-int win_menu();
-void next_level();
+int sd_playgame();
 
 #endif /* MAIN_H_ */
