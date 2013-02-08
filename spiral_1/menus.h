@@ -2,6 +2,9 @@
 #define MENUS_H_
 
 #include "main.h"
+
+int load(void);
+
 int highscores(){
     int i;
     alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 0, 320, 240, 0x0000, 0);
@@ -74,13 +77,46 @@ int menu(){
                 highscores();
             }else if (sel%3 == 2){
                 alt_up_char_buffer_clear(char_buffer);
-                loadgame();
+                load();
             }
             break;
         }
     }
 return 0;}
 
+
+int load(){
+    unsigned int sel = 999;
+    int x = 80;
+
+    alt_up_char_buffer_clear(char_buffer);
+    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 0, 320, 240, 0x0000, 0);
+    alt_up_char_buffer_string(char_buffer, "---LOAD GAME---", 30, 10);
+    alt_up_char_buffer_string(char_buffer, "Saved Game", 30, 26);
+    alt_up_char_buffer_string(char_buffer, "From SD card", 30, 39);
+    alt_up_char_buffer_string(char_buffer, "Cancel", 30, 51);
+
+    menuhelper(sel, x);
+
+    for(;;){
+        dir mydir = getdir();
+        if (mydir == down) menuhelper(++sel, x);
+        else if (mydir == up) menuhelper(--sel, x);
+        else if (mydir == left || mydir == right){
+            if (sel%3 == 0){
+                alt_up_char_buffer_clear(char_buffer);
+                loadgame();
+            }else if (sel%3 == 1){
+                alt_up_char_buffer_clear(char_buffer);
+                // Load game from SD card
+            }else if (sel%3 == 2){
+                alt_up_char_buffer_clear(char_buffer);
+                //Cancel, just return
+            }
+            break;
+        }
+    }
+return 0;}
 
 int pause(){
     int sel = 999;

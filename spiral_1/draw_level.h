@@ -110,8 +110,7 @@ void setup_level(){
         g[4][i] = Water;
 
         g[5][i] = Grass;
-        	g[5][0] = Water;
-        	g[5][gridx-1] = Water;
+        g[5][2] = WinBlock;
         g[6][i] = Highway;
 
         	if(i%2){
