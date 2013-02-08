@@ -7,6 +7,9 @@
 typedef enum { up, down, left, right, nodir, dpause } dir;
 //------------------------------------------------------
 
+char score[20];
+char temp_highscore[20];
+
 void setup_level();
 void init_matrix();
 void draw_topinfo();
