@@ -13,7 +13,7 @@
 
 //------------------------------------------------------
 // Level design
-typedef enum { NoBlock, Grass, Water, Highway, WinBlock, Highway_t } background;
+
 #define c_NoBlock   0x0000
 #define c_Grass     0x0f00
 #define c_Water     0x00f0
@@ -26,7 +26,7 @@ typedef enum { NoBlock, Grass, Water, Highway, WinBlock, Highway_t } background;
 
 char time_remaining[20];
 char time_r[5];
-background g[50][50];
+
 
 
 void draw_topinfo(){
@@ -99,9 +99,10 @@ void printgrid(){
     }
 }
 
-void setup_level(){
-    int i;
-    for ( i=0; i<gridx; i++ ){
+void setup_level(int level_select){
+    if (level_select == 1){
+    	int i;
+    	for ( i=0; i<gridx; i++ ){
         g[0][i] = NoBlock;
         g[1][i] = WinBlock;
 
@@ -127,6 +128,38 @@ void setup_level(){
         g[11][i] = Grass;
         g[12][i] = Grass;
     }
+    }else if(level_select == 2){
+    	int i;
+    	for ( i=0; i<gridx; i++ ){
+			g[0][i] = NoBlock;
+			g[1][i] = WinBlock;
+
+			g[2][i] = Highway;
+
+			if(i%2){
+				g[3][i] = Highway;
+				g[4][i] = Highway;
+				g[5][i] = Highway;
+				g[6][i] = Highway;
+				g[7][i] = Highway;
+				g[8][i] = Highway;
+			}else{
+				g[3][i] = Highway_t;
+				g[4][i] = Highway_t;
+				g[5][i] = Highway_t;
+				g[6][i] = Highway_t;
+				g[7][i] = Highway_t;
+				g[8][i] = Highway_t;
+			}
+
+			g[9][i] = Grass;
+			g[10][i] = Grass;
+			g[11][i] = Grass;
+			g[12][i] = Grass;
+
+    	}
+    }
+
 }
 
 

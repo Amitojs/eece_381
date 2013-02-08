@@ -1,4 +1,3 @@
-
 #ifndef MAIN_H_
 #define MAIN_H_
 
@@ -29,5 +28,6 @@ int draw_frogger();
 int highscores();
 int menu();
 int sd_playgame();
+int win_menu();
 
 #endif /* MAIN_H_ */

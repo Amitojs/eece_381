@@ -13,6 +13,8 @@
 #include "menus.h"
 #include "save.h"
 
+//#include "interface_sd.h"
+
 
 
 //------------------------------------------------------
@@ -125,7 +127,9 @@ int draw_frogger(){
 
 int main(){
     initilize_vga();
+
     for(;;) {
+    	level = 1;
     	init_variables();
 
 

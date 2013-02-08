@@ -108,7 +108,7 @@ int load(){
                 loadgame();
             }else if (sel%3 == 1){
                 alt_up_char_buffer_clear(char_buffer);
-                sd_playgame();
+                //sd_playgame();
                 printf("IM HERE");
             }else if (sel%3 == 2){
                 alt_up_char_buffer_clear(char_buffer);
@@ -149,6 +149,47 @@ int pause(){
             else if (sel%3 == 2){
                 alt_up_char_buffer_clear(char_buffer);
             return 2;}
+
+            break;
+        }
+    }
+    return 0;
+}
+
+int win_menu(){
+    int sel = 999;
+    int x = 180;
+    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(gridx/3), 0, (320/gridx)*(2*gridx/3), 240, 0x0000, 0);
+    alt_up_char_buffer_string(char_buffer, "Continue To Next Level?", 26, 10);
+    alt_up_char_buffer_string(char_buffer, "Yes", 30, 26);
+    alt_up_char_buffer_string(char_buffer, "No", 30, 39);
+    alt_up_char_buffer_string(char_buffer, "Replay Level", 30, 51);
+
+    menuhelper(sel, x);
+    for(;;){
+        dir mydir = getdir();
+        if (mydir == down) menuhelper(++sel, x);
+        else if (mydir == up) menuhelper(--sel, x);
+        else if (mydir == left || mydir == right){
+
+            //Selected to Yes
+            if (sel%3 == 0){
+                alt_up_char_buffer_clear(char_buffer);
+           level = 2;
+           init_variables();
+           playgame();
+           }
+
+            //Selected to No
+            else if (sel%3 == 1){
+                alt_up_char_buffer_clear(char_buffer);
+            win();}
+
+            //Selected to Replay
+            else if (sel%3 == 2){
+                alt_up_char_buffer_clear(char_buffer);
+            init_variables();
+            playgame();}
 
             break;
         }
