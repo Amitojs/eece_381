@@ -12,6 +12,7 @@ char temp_highscore[20];
 
 void setup_level();
 void init_matrix();
+void init_variables();
 void draw_topinfo();
 int pause();
 int win();
@@ -26,5 +27,7 @@ dir getdir();
 int draw_frogger();
 int highscores();
 int menu();
+int win_menu();
+void next_level();
 
 #endif /* MAIN_H_ */

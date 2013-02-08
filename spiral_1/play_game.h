@@ -94,7 +94,7 @@ int playgame(){
 //FINISH - Collision
 
         if ( checkwin() ) {
-            win();
+        	win_menu();
             if ((time_var1-90)*(lives_remaining) > highscore){
             	highscore = (time_var1-90)*(lives_remaining);
             }
