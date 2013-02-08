@@ -9,6 +9,7 @@
 #include <altera_up_avalon_video_character_buffer_with_dma.h>
 #include "initilize_vga.h"
 #include "draw_vehicles.h"
+#include "main.h"
 
 
 

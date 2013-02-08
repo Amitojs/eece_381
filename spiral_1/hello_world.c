@@ -5,11 +5,12 @@
 #include <altera_up_avalon_video_pixel_buffer_dma.h>
 #include <altera_up_avalon_video_character_buffer_with_dma.h>
 
+#include "initilize_vga.h"
+#include "draw_vehicles.h"
+#include "play_game.h"
+#include "main.h"
 
-//------------------------------------------------------
-//Directions
-typedef enum { up, down, left, right, nodir, dpause } dir;
-//------------------------------------------------------
+
 
 
 
@@ -23,10 +24,7 @@ typedef enum { NoBlock, Grass, Water, Highway, WinBlock, Highway_t } background;
 #define c_WinBlock  0x0f10
 #define c_Yellow	0xff00
 
-int pause();
-int win();
-int playgame();
-int die();
+
 //------------------------------------------------------
 
 
@@ -35,9 +33,6 @@ int die();
 
 //------------------------------------------------------
 // Global Variables
-
-    alt_up_pixel_buffer_dma_dev* pixel_buffer;
-    alt_up_char_buffer_dev *char_buffer;
 
     int issavegame = 0;
     background g[50][50];
