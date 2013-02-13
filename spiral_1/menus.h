@@ -108,7 +108,7 @@ int load(){
                 loadgame();
             }else if (sel%3 == 1){
                 alt_up_char_buffer_clear(char_buffer);
-                //sd_playgame();
+                sd_playgame();
                 printf("IM HERE");
             }else if (sel%3 == 2){
                 alt_up_char_buffer_clear(char_buffer);

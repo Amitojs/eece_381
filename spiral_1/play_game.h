@@ -10,7 +10,7 @@
 #include "initilize_vga.h"
 #include "draw_vehicles.h"
 #include "main.h"
-//#include "interface_SD.h"
+#include "interface_SD.h"
 
 
 
@@ -36,7 +36,8 @@ int carsy[numlogs];
 
 int level = 1;
 //------------------------------------------------------
-/*int sd_playgame(){
+int sd_playgame(){
+
 	int i,j;
 	int countlog=0;
 	int countcar=0;
@@ -61,7 +62,7 @@ int level = 1;
 				g[i][j] = Highway;
 			else if ((unsigned char)levelbuffer[i][j] == '4')
 				g[i][j] = WinBlock;
-			//printf("%c", levelbuffer[i][j]);
+			printf("%c", levelbuffer[i][j]);
 		}
 	}
 	countlog=0;
@@ -129,6 +130,7 @@ int level = 1;
 			if ((time_var1-90)*(lives_remaining) > highscore){
 				highscore = (time_var1-90)*(lives_remaining);
 			}
+			printf("won");
 			return 0;
 		}
 
@@ -147,7 +149,7 @@ int level = 1;
 	}
 
 }
-*/
+
 int playgame(){
 
 //Initialize Variables

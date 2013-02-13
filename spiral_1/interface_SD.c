@@ -25,6 +25,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "interface_SD.h"
 #include <altera_up_sd_card_avalon_interface.h>
 
@@ -100,6 +101,7 @@ int file_read(char* charbuffer, char* filename, int charmax){
 	return -1;
 
 }
+
 
 /* Returns the number of files 	 within the SD card and adds all all filenames to an array provided
  * by the calling function.
@@ -265,9 +267,11 @@ void level_data(char* filename, char* levelbuffer, char* objectbuffer){
 	while (*dataptr != '*')
 		dataptr++;
 	dataptr++;
-	for(k=0; k<height; k++){
+	for(k=0; k<=height; k++){
 		for(j=0;j<width;j++){
 			*levelbuffer = *dataptr;
+			if ( *dataptr == '\n' )
+				levelbuffer-=2;
 			levelbuffer++;
 			dataptr++;
 		}
@@ -277,9 +281,11 @@ void level_data(char* filename, char* levelbuffer, char* objectbuffer){
 	while (*dataptr != '$')
 		dataptr++;
 	dataptr++;
-	for(k=0; k<height; k++){
+	for(k=0; k<=height; k++){
 		for(j=0;j<width;j++){
 			*objectbuffer = *dataptr;
+			if ( *dataptr == '\n' )
+				objectbuffer-=2;
 			objectbuffer++;
 			dataptr++;
 		}
@@ -326,34 +332,81 @@ so I propose to have the storage array change based on the size of the level (S/
  */
 
 
-char* bmp_read(char* filename, char* pixeldata) {
+void bmp_read(char* filename, char* pixeldata, char* palptr) {
 
 	char image[2048] = {0};
 	char* imageptr;
 	imageptr = &image[0];
-	char palette[768] = {0};
-	char* palptr;
-	palptr = &palette[0];
+	//char* palptr;
+	//palptr = &palette[0];
 	int i;
-	int offset = 0x36;
+	int offset = 0;//0x36;
 
-	file_read (imageptr, filename, 2048);
+	//file_read (imageptr, filename, 2048);
+
+
+	if ((alt_up_sd_card_is_Present())) {
+			if (alt_up_sd_card_is_FAT16()) {
+
+				short int file0;
+				int k;
+				//int charcount;
+
+				//Open the file in the argument for reading. False means that the file will not be created
+				//if it is not found. A negative return value means that the file was not opened successfully
+				file0 = alt_up_sd_card_fopen(filename, false);
+
+				if (file0 == -1) return -1;
+				if (file0 == -2) return -2;
+
+				//Read as many characters as possible from the file, up to charmax or until the file has been read
+				//to completion.
+				else {
+					for(k=0; k<2048; k++){
+						*(imageptr+k) = (char)alt_up_sd_card_read(file0);
+
+						//If the end of file has been reached, stop reading. EOF is designated with a negative value
+						//if ((*(charbuffer+k) == -1) && (*(charbuffer+k-1) == -1) && (*(charbuffer+k-2) == -1) && (*(charbuffer+k-3)== -1)){
+							//break;
+						//}
+
+						//charcount = k;
+
+					}
+
+				}
+
+				//Close the file and return the amount of characters read into the buffer
+				alt_up_sd_card_fclose(file0);
+				//return charcount;
+			}
+
+		}
+		//return -1;
+
+
 	offset += *(imageptr+0xA);
 	offset += *(imageptr+0xB)*256;
 
-	for(i=0; i<2048;i++){
-		if(i%16 == 0)
-			*(pixeldata+i)= *(imageptr+i);
+	for(i=0; i<480;i++){
+		//if(i%16 == 0)
+			*(pixeldata+i)= *(imageptr+offset+i);
+			//printf( "%02hhX ", *(pixeldata+i) );
+			//if(i%20 == 0) printf("\n");
 
 	}
 
 	for(i=0; i<256; i++){
-		palette[3*i] = *(imageptr + 3*i);
-		palette[3*i+1] = *(imageptr+3*i+1);
-		palette[3*i+2] = *(imageptr+3*i+2);
+		*(palptr + 3*i)   = *(imageptr + 4*i + 0 + 0x36);
+		*(palptr + 3*i + 1) = *(imageptr + 4*i + 1 + 0x36);
+		*(palptr + 3*i + 2) = *(imageptr + 4*i + 2 + 0x36);
 	}
+	//printf("");
 
-	return palptr;
+	//printf( "\n %02hhX , %02hhX , %02hhX, %02hhX \n",  *(imageptr+4*0xFC+0x36),*(imageptr+4*0xFc+1+0x36),*(imageptr+4*0xFC+2+0x36),*(imageptr+4*0xFC+3+0x36)); //b --1
+	//printf( "\n %02hhX , %02hhX , %02hhX \n",  palette[750], palette[751], palette[752]);
+
+	return;
 
 }
 

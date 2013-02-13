@@ -29,5 +29,6 @@ int highscores();
 int menu();
 int sd_playgame();
 int win_menu();
+void init_variables();
 
 #endif /* MAIN_H_ */

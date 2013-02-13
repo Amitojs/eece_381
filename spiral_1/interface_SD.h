@@ -30,6 +30,6 @@ void level_load(char*, char*);
 //prototype for getting level names
 int levelnames(char* levelmatrix);
 //prototype for reading a bitmap image
-char* bmp_read(char*, char*);
+void bmp_read(char*, char*, char*);
 
 #endif /* SD_INTERFACE_H_ */
