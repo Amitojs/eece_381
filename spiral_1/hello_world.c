@@ -14,12 +14,16 @@
 #include "save.h"
 
 #include "interface_sd.h"
-
-
+#include "ps2.h"
 
 //------------------------------------------------------
 // Global Variables
 dir lastdir;
+dir secondlastdir;
+
+unsigned int* colourptr;
+unsigned int colourarr [256];
+
 dir last_real_dir = up;
 char palette[768];
 unsigned char temp[480];
@@ -44,8 +48,13 @@ void init_variables(){
 	lives_remaining = 3;
 	time_var1 = 150;
 	time_var2 =0;
+
 	trucks[0] = (320/gridx)*0;
 	trucks[1] = (320/gridx)*8;
+	trucks[2] = (320/gridx)*4;
+	trucks[3] = (320/gridx)*15;
+	trucks[4] = (320/gridx)*10;
+	trucks[5] = (320/gridx)*15;
 
 	cars[0] = (320/gridx)*1;
 	cars[1] = (320/gridx)*6;
@@ -53,6 +62,16 @@ void init_variables(){
 	cars[3] = (320/gridx)*2.5;
 	cars[4] = (320/gridx)*7.5;
 	cars[5] = (320/gridx)*12.5;
+	cars[6]	= (320/gridx)*2;
+	cars[7] = (320/gridx)*4;
+	cars[8] = (320/gridx)*2;
+	cars[9] = (320/gridx)*8;
+	cars[10]= (320/gridx)*10;
+	cars[11]= (320/gridx)*8;
+	cars[12]= (320/gridx)*16;
+
+	cars[13]= (320/gridx)*0;
+	cars[14]= (320/gridx)*6;
 
 	logs[0]	= (320/gridx)*1;
 	logs[1]	= (320/gridx)*5;
@@ -75,26 +94,45 @@ int swfinder(){
 }
 
 dir getdir(){
-	if       (swfinder() == 0){
-		lastdir = nodir;
-	}else if (swfinder() == 1 && lastdir == nodir){
-		lastdir = down;
-		last_real_dir = down;
-	}else if (swfinder() == 2 && lastdir == nodir){
-		lastdir = up;
-		last_real_dir = up;
-	}else if (swfinder() == 4 && lastdir == nodir){
-		lastdir = right;
-		last_real_dir = right;
-	}else if (swfinder() == 8 && lastdir == nodir){
-		lastdir = left;
-		last_real_dir = left;
-	}else if (swfinder() == 16){
-		lastdir = dpause;
-	}else{
+	if ( (keyb_set) ) { // get direction from keyboard
+		dir dirFromKeyB;
+		dirFromKeyB = getDirectionFromKeyboard(lastdir, secondlastdir);
+		if ( (dirFromKeyB == dpause) || (dirFromKeyB == up) || (dirFromKeyB == down) || (dirFromKeyB == right) || (dirFromKeyB == left) ) {
+			lastdir = dirFromKeyB;
+			last_real_dir = dirFromKeyB;
+			return dirFromKeyB;
+		} else if ( (dirFromKeyB == changedir) || (dirFromKeyB == dontchangedir) ){
+			secondlastdir = dirFromKeyB;
+			lastdir = nodir;
+			return nodir;
+		} else
+			lastdir = nodir;
 		return nodir;
+	} else {
+
+
+		if       (swfinder() == 0){
+			lastdir = nodir;
+		}else if (swfinder() == 1 && lastdir == nodir){
+			lastdir = down;
+			last_real_dir = down;
+		}else if (swfinder() == 2 && lastdir == nodir){
+			lastdir = up;
+			last_real_dir = up;
+		}else if (swfinder() == 4 && lastdir == nodir){
+			lastdir = right;
+			last_real_dir = right;
+		}else if (swfinder() == 8 && lastdir == nodir){
+			lastdir = left;
+			last_real_dir = left;
+		}else if (swfinder() == 16){
+			lastdir = dpause;
+		}else{
+			return nodir;
+		}
+		return lastdir;
+
 	}
-	return lastdir;
 }
 
 int draw_frogger(){
@@ -132,6 +170,7 @@ int draw_frogger(){
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 
+/*
 unsigned int get_colour(char* palptr, unsigned char tempstuff){
 	unsigned int blue,green,red;
 	unsigned int colour;
@@ -143,6 +182,21 @@ unsigned int get_colour(char* palptr, unsigned char tempstuff){
 
 	return colour;
 }
+ */
+
+unsigned int* palgen(char* palptr){
+	unsigned int blue,green,red;
+	unsigned int* colour = &colourarr[0];
+	int i;
+	for (i = 0; i<256; i++){
+		blue  = *(palptr + 3*i  + 0);
+		green = *(palptr + 3*i + 1);
+		red   = *(palptr + 3*i + 2);
+		colourarr[i] = ( (red << 8)& 0xf800) | ( (green << 3) & 0x07E0 )| ( (blue >> 3 )& 0x1F);
+	}
+	return colour;
+}
+
 
 void frog_bmp_init(){
 	palptr = &palette[0];
@@ -150,50 +204,51 @@ void frog_bmp_init(){
 	bmp_read("blank.bmp", tempptr, palptr);
 	bmp_read("frogger2.bmp", tempptr, palptr);
 	//bmp_read("frogger4.bmp", tempptr, palptr);
+	colourptr = palgen (palptr);
 }
 
 void frog_bmp_draw(){
 	int i,j;
 	unsigned int colour;
 
-//if (last_fx != frog_x || last_fy != frog_y){
+	//if (last_fx != frog_x || last_fy != frog_y){
 	if ( last_real_dir == up ){
 		for( i=0; i<24; i++){
 			for ( j=0; j<20; j++){
-				colour = get_colour( palptr, temp[i*20 + j] );
+				colour = colourarr[temp[i*20+j]];
 				if (colour != 0xffff)
-				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x+j, frog_y-i+23, frog_x+j, frog_y-i+23, colour, 1);
+
+					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x+j, frog_y-i+23, frog_x+j, frog_y-i+23, colour, 1);
 			}
 		}
 	}else if ( last_real_dir == down){
 		for( i=0; i<24; i++){
 			for ( j=0; j<20; j++){
-				colour = get_colour( palptr, temp[i*20 + j] );
+				colour = colourarr[temp[i*20+j]];
 				if (colour != 0xffff)
-				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x+j, frog_y+i, frog_x+j, frog_y+i, colour, 1);
+					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x+j, frog_y+i, frog_x+j, frog_y+i, colour, 1);
 			}
 		}
 	}else if (last_real_dir == right){
 		for( i=0; i<24; i++){
 			for ( j=0; j<20; j++){
-				colour = get_colour( palptr, temp[i*20 + j] );
+				colour = colourarr[temp[i*20+j]];
 				if (colour != 0xffff)
-				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x+i, frog_y+j+2, frog_x+i, frog_y+j+2, colour, 1);
+					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x+i, frog_y+j+2, frog_x+i, frog_y+j+2, colour, 1);
 			}
 		}
 	}else if (last_real_dir == left){
 		for( i=0; i<24; i++){
 			for ( j=0; j<20; j++){
-				colour = get_colour( palptr, temp[i*20 + j] );
+				colour = colourarr[temp[i*20+j]];
 				if (colour != 0xffff)
-				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x-i+19, frog_y+j+2, frog_x-i+19, frog_y+j+2, colour, 1);
+					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x-i+19, frog_y+j+2, frog_x-i+19, frog_y+j+2, colour, 1);
 			}
 		}
 	}
-//}
-//last_fx = frog_x;
-//last_fy = frog_y;
+
 }
+
 
 int main(){
 
@@ -203,6 +258,8 @@ int main(){
 	sd_init();
 
 	frog_bmp_init();
+
+	initialize_ps2();
 
 	for(;;) {
 		level = 1;

@@ -34,6 +34,7 @@ int cars[numcars];
 
 #define numlogs 20
 int logs[numlogs];
+int logsdir[numlogs];
 
 int logsy[numlogs];
 int carsy[numcars];
@@ -79,6 +80,7 @@ int sd_playgame(){
 		for (j=0; j<16; j++){
 			if ( objectbuffer[i][j] == '3'){
 				logs[countlog] = (320/gridx)*j;
+				logsdir[countlog] = i%2;
 				logsy[countlog++] = (240/gridy)*i;
 			}
 			else if ( objectbuffer[i][j] == '2'){
@@ -105,7 +107,7 @@ int sd_playgame(){
 		draw_topinfo();
 
 		for (i = 0; i<countlog; i++){
-			logs[i]	= draw_vehicle(log,   logs[i],   logsy[i], 0x5200,  3,   1, 1);
+			logs[i]	= draw_vehicle(log,   logs[i],   logsy[i], 0x5200,  3,   logsdir[i], 1);
 		}
 		for (i = 0; i<countcar; i++){
 			cars[i]	= draw_vehicle(car,   cars[i],   carsy[i], 0x867,  2,   1, 2);
@@ -120,8 +122,6 @@ int sd_playgame(){
 			return 0;
 		}
 
-		while (alt_up_pixel_buffer_dma_swap_buffers(pixel_buffer) != 0){};
-		while (alt_up_pixel_buffer_dma_check_swap_buffers_status(pixel_buffer) != 0){};
 		//START - Collision
 		if(movement_matrix[frog_y/(240/gridy)][frog_x/(320/gridx)] == 1 ){
 			frog_x = (320/gridx)*6;
@@ -160,6 +160,8 @@ int sd_playgame(){
 				time_var2=0;
 			}
 		}
+		while (alt_up_pixel_buffer_dma_swap_buffers(pixel_buffer) != 0){};
+		while (alt_up_pixel_buffer_dma_check_swap_buffers_status(pixel_buffer) != 0){};
 	}
 
 }
@@ -192,23 +194,54 @@ int playgame(){
 		printgrid();
 		draw_topinfo();
 
-		trucks[0] = draw_vehicle(truck, trucks[0], (240/gridy)*8, 0x678,  3,  1, 1);
-		trucks[1] = draw_vehicle(truck, trucks[1], (240/gridy)*8, 0x534,  3,  1, 1);
+		if (level == 2 ){
+			trucks[0] = draw_vehicle(truck, trucks[0], (240/gridy)*8, 0x678,  3,  1, 4);
+			trucks[1] = draw_vehicle(truck, trucks[1], (240/gridy)*8, 0x534,  3,  1, 4);
 
-		cars[0] = draw_vehicle(car,   cars[0],   (240/gridy)*7, 0x267,  2, -1, 2);
-		cars[1] = draw_vehicle(car,   cars[1],   (240/gridy)*7, 0x234,  2, -1, 2);
-		cars[2] = draw_vehicle(car,   cars[2],   (240/gridy)*7, 0x533,  2, -1, 2);
-		cars[3] = draw_vehicle(car,   cars[3],   (240/gridy)*6, 0x867,  2,  1, 2);
-		cars[4] = draw_vehicle(car,   cars[4],   (240/gridy)*6, 0x165,  2,  1, 2);
-		cars[5] = draw_vehicle(car,   cars[5],   (240/gridy)*6, 0x378,  2,  1, 2);
+			trucks[2] = draw_vehicle(truck, trucks[2], (240/gridy)*4, 0x678,  3,  1, 4);
+			trucks[3] = draw_vehicle(truck, trucks[3], (240/gridy)*3, 0x534,  3,  -1, 3);
+			trucks[4] = draw_vehicle(truck, trucks[4], (240/gridy)*4, 0x534,  3,  1, 4);
+			trucks[5] = draw_vehicle(truck, trucks[5], (240/gridy)*4, 0x534,  3,  1, 4);
 
-		logs[0]	= draw_vehicle(log,   logs[0],   (240/gridy)*4, 0x5200,  3,   1, 1);
-		logs[1]	= draw_vehicle(log,   logs[1],   (240/gridy)*4, 0x5200,  2,   1, 1);
-		logs[2]	= draw_vehicle(log,   logs[2],   (240/gridy)*3, 0x5200,  3,  -1, 1);
-		logs[3]	= draw_vehicle(log,   logs[3],   (240/gridy)*3, 0x5200,  2,  -1, 1);
-		logs[4]	= draw_vehicle(log,   logs[4],   (240/gridy)*2, 0x5200,  3,   1, 1);
-		logs[5]	= draw_vehicle(log,   logs[5],   (240/gridy)*2, 0x5200,  3,   1, 1);
 
+			cars[6] = draw_vehicle(car,   cars[6],   (240/gridy)*2, 0xff00,  2,  1, 5);
+			cars[7] = draw_vehicle(car,   cars[7],   (240/gridy)*2, 0xff00,  2,  1, 5);
+
+			cars[8] = draw_vehicle(car,   cars[8],   (240/gridy)*5, 0x533,  2, -1, 3);
+
+			cars[9] = draw_vehicle(car,   cars[9],   (240/gridy)*2, 0xff00,  2,  1, 5);
+			cars[10] = draw_vehicle(car,  cars[10],  (240/gridy)*2, 0xff00,  2,  1, 5);
+			cars[11] = draw_vehicle(car,  cars[11],  (240/gridy)*5, 0x267,   2, -1, 3);
+			cars[12] = draw_vehicle(car,  cars[12],  (240/gridy)*5, 0x267,   2, -1, 3);
+
+			cars[13] = draw_vehicle(car,  cars[13],  (240/gridy)*3, 0x533,   2, -1, 3);
+			cars[14] = draw_vehicle(car,  cars[14],  (240/gridy)*3, 0x533,   2, -1, 3);
+
+			cars[0] = draw_vehicle(car,   cars[0],   (240/gridy)*7, 0x267,  2, -1, 3);
+			cars[1] = draw_vehicle(car,   cars[1],   (240/gridy)*7, 0x234,  2, -1, 3);
+			cars[2] = draw_vehicle(car,   cars[2],   (240/gridy)*7, 0x533,  2, -1, 3);
+			cars[3] = draw_vehicle(car,   cars[3],   (240/gridy)*6, 0x867,  2,  1, 3);
+			cars[4] = draw_vehicle(car,   cars[4],   (240/gridy)*6, 0x165,  2,  1, 3);
+			cars[5] = draw_vehicle(car,   cars[5],   (240/gridy)*6, 0x378,  2,  1, 3);
+
+		}else if (level == 1){
+			trucks[0] = draw_vehicle(truck, trucks[0], (240/gridy)*8, 0x678,  3,  1, 1);
+			trucks[1] = draw_vehicle(truck, trucks[1], (240/gridy)*8, 0x534,  3,  1, 1);
+
+			cars[0] = draw_vehicle(car,   cars[0],   (240/gridy)*7, 0x267,  2, -1, 2);
+			cars[1] = draw_vehicle(car,   cars[1],   (240/gridy)*7, 0x234,  2, -1, 2);
+			cars[2] = draw_vehicle(car,   cars[2],   (240/gridy)*7, 0x533,  2, -1, 2);
+			cars[3] = draw_vehicle(car,   cars[3],   (240/gridy)*6, 0x867,  2,  1, 2);
+			cars[4] = draw_vehicle(car,   cars[4],   (240/gridy)*6, 0x165,  2,  1, 2);
+			cars[5] = draw_vehicle(car,   cars[5],   (240/gridy)*6, 0x378,  2,  1, 2);
+
+			logs[0]	= draw_vehicle(log,   logs[0],   (240/gridy)*4, 0x5200,  3,   1, 1);
+			logs[1]	= draw_vehicle(log,   logs[1],   (240/gridy)*4, 0x5200,  2,   1, 1);
+			logs[2]	= draw_vehicle(log,   logs[2],   (240/gridy)*3, 0x5200,  3,  -1, 1);
+			logs[3]	= draw_vehicle(log,   logs[3],   (240/gridy)*3, 0x5200,  2,  -1, 1);
+			logs[4]	= draw_vehicle(log,   logs[4],   (240/gridy)*2, 0x5200,  3,   1, 1);
+			logs[5]	= draw_vehicle(log,   logs[5],   (240/gridy)*2, 0x5200,  3,   1, 1);
+		}
 
 
 
