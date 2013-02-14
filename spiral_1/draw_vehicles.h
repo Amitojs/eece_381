@@ -35,70 +35,82 @@ int draw_vehicle(vehicle myvehicle, int x_location, int y_location, int colour, 
 		colour_3 = colour;
 	}
 
-    switch(direction){
-        case 1:
-            if(x_location>= (320/gridx)){
-                    alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-(320/gridx), y_location, x_location, y_location+(240/gridy) - 1, colour, 1);
-            }else{
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location, y_location+(240/gridy) - 1, colour, 1);
-            }
-            if(x_location>= 40){
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-40, y_location, x_location-(320/gridx), y_location+(240/gridy) - 1, colour_2, 1);
-            }else if(x_location> (320/gridx) && x_location< 40){
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location-(320/gridx), y_location+(240/gridy) - 1, colour_2, 1);
-            }
-            if (x_location >= 60 && size == 3){
-            	alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-60, y_location, x_location-40, y_location+(240/gridy) - 1, colour_3, 1);
-            }else if(x_location > 40 && x_location < 60 && size == 3){
-            	alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location-40, y_location+(240/gridy) - 1, colour_3, 1);
-            }
+	switch(direction){
+	case 1:
+		if(x_location>= (320/gridx)){
+			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-(320/gridx), y_location, x_location, y_location+(240/gridy) - 1, colour, 1);
+		}else{
+			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location, y_location+(240/gridy) - 1, colour, 1);
+		}
+		if(x_location>= 40){
+			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-40, y_location, x_location-(320/gridx), y_location+(240/gridy) - 1, colour_2, 1);
+		}else if(x_location> (320/gridx) && x_location< 40){
+			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location-(320/gridx), y_location+(240/gridy) - 1, colour_2, 1);
+		}
+		if (x_location >= 60 && size == 3){
+			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-60, y_location, x_location-40, y_location+(240/gridy) - 1, colour_3, 1);
+		}else if(x_location > 40 && x_location < 60 && size == 3){
+			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location-40, y_location+(240/gridy) - 1, colour_3, 1);
+		}
 
-            x_location=x_location+speed;
-            if(x_location >= (320/gridx)*(gridx+3)){x_location=0;}
-            if (myvehicle == log){
-				movement_matrix[y_location/(240/gridy)][(x_location)/(320/gridx)] = -1;
-				if (x_location >= (320/gridx)){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = -1;}
-				if (x_location >= (320/gridx)*2){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx)*2)/(320/gridx)] = -1;}
-				if (x_location >= (320/gridx)*3 && size == 3){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx)*3)/(320/gridx)] = -1;}
-            }else{
-            	movement_matrix[y_location/(240/gridy)][(x_location)/(320/gridx)] = 1;
-				if (x_location >= (320/gridx)){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = 1;}
-				if (x_location >= (320/gridx)*2){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx)*2)/(320/gridx)] = 1;}
-				if (x_location >= (320/gridx)*3 && size == 3){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx)*3)/(320/gridx)] = 1;}
+		x_location=x_location+speed;
+		if(x_location >= (320/gridx)*(gridx+3)){x_location=0;}
+		if (myvehicle == log){
+			movement_matrix[y_location/(240/gridy)][(x_location)/(320/gridx)] = -1;
+			if (x_location >= (320/gridx)){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = -1;}
+			if (x_location >= (320/gridx)*2){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx)*2)/(320/gridx)] = -1;}
+			if (x_location >= (320/gridx)*3 && size == 3){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx)*3)/(320/gridx)] = -1;}
+		}else{
+			movement_matrix[y_location/(240/gridy)][(x_location)/(320/gridx)] = 1;
+			if (x_location >= (320/gridx)){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = 1;}
+			if (x_location >= (320/gridx)*2){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx)*2)/(320/gridx)] = 1;}
+			if (x_location >= (320/gridx)*3 && size == 3){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx)*3)/(320/gridx)] = 1;}
 
-            }
-            break;
-        default:
-            if(x_location >= (320/gridx)){
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-(320/gridx), y_location, x_location, y_location+(240/gridy) - 1, colour, 1);
-            }else{
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location, y_location+(240/gridy) - 1, colour, 1);
-            }
-            if(x_location >= (320/gridx)*2){
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-(320/gridx)*2, y_location, x_location-(320/gridx), y_location+(240/gridy) - 1, colour_2, 1);
-            }else if(x_location > (320/gridx) && x_location < (320/gridx)*2){
-                alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location-(320/gridx), y_location+(240/gridy) - 1, colour_2, 1);
-            }
-            if(x_location >= (320/gridx)*3 && size == 3){
-				 alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-(320/gridx)*3, y_location, x_location-(320/gridx)*2, y_location+(240/gridy) - 1, colour_3, 1);
-			 }else if(x_location > (320/gridx)*2 && x_location < (320/gridx)*3 && size == 3){
-				 alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location-(320/gridx)*2, y_location+(240/gridy) - 1, colour_3, 1);
-			 }
-            x_location=x_location-speed;
-            if(x_location <= 0){x_location=(320/gridx)*(gridx+2);}
-            if (myvehicle == log){
-            movement_matrix[y_location/(240/gridy)][(x_location)/(320/gridx)] = 0;
-				if (x_location>= (320/gridx)){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = -2;}
-				if (x_location>= (320/gridx)*2){movement_matrix[y_location/(240/gridy)][(x_location-((320/gridx)*2))/(320/gridx)] = -2;}
-				if (x_location>= (320/gridx)*3 && size == 3){movement_matrix[y_location/(240/gridy)][(x_location-((320/gridx)*3))/(320/gridx)] = -2;}
-            }else{
-            	if (x_location>= (320/gridx)){movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = 1;}
-				if (x_location>= (320/gridx)*2){movement_matrix[y_location/(240/gridy)][(x_location-((320/gridx)*2))/(320/gridx)] = 1;}
-				if (x_location>= (320/gridx)*3 && size == 3){movement_matrix[y_location/(240/gridy)][(x_location-((320/gridx)*3))/(320/gridx)] = 1;}
-            }
-            break;
-    	}
-    return x_location;
+		}
+		break;
+	default:
+		if(x_location >= (320/gridx)){
+			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-(320/gridx), y_location, x_location, y_location+(240/gridy) - 1, colour, 1);
+		}else{
+			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location, y_location+(240/gridy) - 1, colour, 1);
+		}
+		if(x_location >= (320/gridx)*2){
+			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-(320/gridx)*2, y_location, x_location-(320/gridx), y_location+(240/gridy) - 1, colour_2, 1);
+		}else if(x_location > (320/gridx) && x_location < (320/gridx)*2){
+			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location-(320/gridx), y_location+(240/gridy) - 1, colour_2, 1);
+		}
+		if(x_location >= (320/gridx)*3 && size == 3){
+			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x_location-(320/gridx)*3, y_location, x_location-(320/gridx)*2, y_location+(240/gridy) - 1, colour_3, 1);
+		}else if(x_location > (320/gridx)*2 && x_location < (320/gridx)*3 && size == 3){
+			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, y_location, x_location-(320/gridx)*2, y_location+(240/gridy) - 1, colour_3, 1);
+		}
+		x_location=x_location-speed;
+		if(x_location <= 0){x_location=(320/gridx)*(gridx+2);}
+		if (myvehicle == log){
+			movement_matrix[y_location/(240/gridy)][(x_location)/(320/gridx)] = 0;
+			if (x_location>= (320/gridx)){
+				movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = -2;
+			}
+			if (x_location>= (320/gridx)*2){
+				movement_matrix[y_location/(240/gridy)][(x_location-((320/gridx)*2))/(320/gridx)] = -2;
+			}
+			if (x_location>= (320/gridx)*3 && size == 3){
+				movement_matrix[y_location/(240/gridy)][(x_location-((320/gridx)*3))/(320/gridx)] = -2;
+			}
+		}else{
+			if (x_location>= (320/gridx)){
+				movement_matrix[y_location/(240/gridy)][(x_location-(320/gridx))/(320/gridx)] = 1;
+			}
+			if (x_location>= (320/gridx)*2){
+				movement_matrix[y_location/(240/gridy)][(x_location-((320/gridx)*2))/(320/gridx)] = 1;
+			}
+			if (x_location>= (320/gridx)*3 && size == 3){
+				movement_matrix[y_location/(240/gridy)][(x_location-((320/gridx)*3))/(320/gridx)] = 1;
+			}
+		}
+		break;
+	}
+	return x_location;
 }
 
 #endif

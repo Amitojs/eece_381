@@ -16,12 +16,12 @@
 #define YOUR_SRAM_ADDR          0x80000
 
 //Change this to your local SW address
-//#define YOUR_SWITCHES_ADDR        0x2000  //Scott's
-#define YOUR_SWITCHES_ADDR      0x4010  //Amitoj's
+#define YOUR_SWITCHES_ADDR        0x2000  //Scott's
+//#define YOUR_SWITCHES_ADDR      0x4010  //Amitoj's
 
 //Change to your QSYS local name
-//#define YOUR_PIXEL_BUFFER_NAME    "/dev/video_pixel_buffer_dma_0"  //Scott's
-#define YOUR_PIXEL_BUFFER_NAME  "/dev/pixel_buffer_dma"  //Amitoj's
+#define YOUR_PIXEL_BUFFER_NAME    "/dev/video_pixel_buffer_dma_0"  //Scott's
+//#define YOUR_PIXEL_BUFFER_NAME  "/dev/pixel_buffer_dma"  //Amitoj's
 
 //Change to your QSYS local name
 #define YOUR_CHAR_BUFFER_NAME   "/dev/char_drawer"

@@ -20,6 +20,13 @@
 //------------------------------------------------------
 // Global Variables
 dir lastdir;
+dir last_real_dir = up;
+char palette[768];
+unsigned char temp[480];
+char* palptr;
+unsigned char* tempptr;
+int last_fx = 0;
+int last_fy = 0;
 //------------------------------------------------------
 
 void init_matrix(){
@@ -37,8 +44,8 @@ void init_variables(){
 	lives_remaining = 3;
 	time_var1 = 150;
 	time_var2 =0;
-	truck_1 = (320/gridx)*0;
-	truck_2 = (320/gridx)*8;
+	trucks[0] = (320/gridx)*0;
+	trucks[1] = (320/gridx)*8;
 
 	cars[0] = (320/gridx)*1;
 	cars[1] = (320/gridx)*6;
@@ -72,12 +79,16 @@ dir getdir(){
 		lastdir = nodir;
 	}else if (swfinder() == 1 && lastdir == nodir){
 		lastdir = down;
+		last_real_dir = down;
 	}else if (swfinder() == 2 && lastdir == nodir){
 		lastdir = up;
+		last_real_dir = up;
 	}else if (swfinder() == 4 && lastdir == nodir){
 		lastdir = right;
+		last_real_dir = right;
 	}else if (swfinder() == 8 && lastdir == nodir){
 		lastdir = left;
+		last_real_dir = left;
 	}else if (swfinder() == 16){
 		lastdir = dpause;
 	}else{
@@ -111,12 +122,7 @@ int draw_frogger(){
 		}
 	}
 
-	//Draw's Frogger
-	alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x,    frog_y,   frog_x+(320/gridx), frog_y+(240/gridy)-1, 0xF000, 1);
-	//Draw's Frogger's Eyes
-	alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x+(320/(gridx*10)),  frog_y+(240/(gridy*6)), frog_x+(320/(gridx*10))+(320/(gridx*4)),  frog_y+(240/(gridy*12)),  0x0000, 1);
-	alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x+(320/gridx)-(320/(gridx*10))-(320/(gridx*4)), frog_y+(240/(gridy*6)), frog_x+(320/gridx)-(320/(gridx*10)), frog_y+(240/(gridy*12)),  0x0000, 1);
-
+	frog_bmp_draw();
 
 	return 0;
 }
@@ -126,66 +132,86 @@ int draw_frogger(){
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 
-//b g r
 unsigned int get_colour(char* palptr, unsigned char tempstuff){
 	unsigned int blue,green,red;
 	unsigned int colour;
 	blue  = *(palptr + 3*tempstuff  + 0);
 	green = *(palptr + 3*tempstuff + 1);
 	red   = *(palptr + 3*tempstuff + 2);
-	//printf("%02hhX ", tempstuff);
-	//printf( "\n %02hhX , %02hhX , %02hhX \n",  *(palptr + 755), *(palptr+756), *(palptr+757) );
-
-	//printf("%02hhX:%02hhX:%02hhX \n", red, green,blue);
 
 	colour = ( (red << 8)& 0xf800) | ( (green << 3) & 0x07E0 )| ( (blue >> 3 )& 0x1F);
 
 	return colour;
 }
 
-void durrr(){
-	int i,j;
-	unsigned int colour;
-	unsigned char temp[480];
-	unsigned char* tempptr = &temp[0];
-	char palette[768];
-	char* palptr = &palette[0];
-	bmp_read("dix.bmp", tempptr, palptr);
-
-
-	for( i=0; i<24; i++){
-		for ( j=0; j<20; j++){
-			colour = get_colour( palptr, temp[i*20 + j] );
-			alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 100+j, 100+i, 100+j, 100+i, colour, 0);
-		}
-	}
-
-	/*
-	for (i=0; i<768; i++){
-		if (i%3 ==0) printf("\n");
-		printf("%02hhX ", *(palptr+i));
-	}
-	*/
+void frog_bmp_init(){
+	palptr = &palette[0];
+	tempptr = &temp[0];
+	bmp_read("blank.bmp", tempptr, palptr);
+	bmp_read("frogger2.bmp", tempptr, palptr);
+	//bmp_read("frogger4.bmp", tempptr, palptr);
 }
 
+void frog_bmp_draw(){
+	int i,j;
+	unsigned int colour;
+
+//if (last_fx != frog_x || last_fy != frog_y){
+	if ( last_real_dir == up ){
+		for( i=0; i<24; i++){
+			for ( j=0; j<20; j++){
+				colour = get_colour( palptr, temp[i*20 + j] );
+				if (colour != 0xffff)
+				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x+j, frog_y-i+23, frog_x+j, frog_y-i+23, colour, 1);
+			}
+		}
+	}else if ( last_real_dir == down){
+		for( i=0; i<24; i++){
+			for ( j=0; j<20; j++){
+				colour = get_colour( palptr, temp[i*20 + j] );
+				if (colour != 0xffff)
+				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x+j, frog_y+i, frog_x+j, frog_y+i, colour, 1);
+			}
+		}
+	}else if (last_real_dir == right){
+		for( i=0; i<24; i++){
+			for ( j=0; j<20; j++){
+				colour = get_colour( palptr, temp[i*20 + j] );
+				if (colour != 0xffff)
+				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x+i, frog_y+j+2, frog_x+i, frog_y+j+2, colour, 1);
+			}
+		}
+	}else if (last_real_dir == left){
+		for( i=0; i<24; i++){
+			for ( j=0; j<20; j++){
+				colour = get_colour( palptr, temp[i*20 + j] );
+				if (colour != 0xffff)
+				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x-i+19, frog_y+j+2, frog_x-i+19, frog_y+j+2, colour, 1);
+			}
+		}
+	}
+//}
+//last_fx = frog_x;
+//last_fy = frog_y;
+}
 
 int main(){
+
 
 	initilize_vga();
 
 	sd_init();
-	durrr();
+
+	frog_bmp_init();
+
+	for(;;) {
+		level = 1;
+		init_variables();
 
 
-	/*
-    for(;;) {
-    	level = 1;
-    	init_variables();
+		menu();
+	}
 
-
-        menu();
-    }
-    */
-    return 0;
+	return 0;
 
 }

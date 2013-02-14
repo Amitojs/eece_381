@@ -7,13 +7,15 @@
 
     int issavegame = 0;
 
+    int s_level;
     int s_time_var1;
     int s_frog_x;
     int s_frog_y;
     int s_lives_remaining;
     int s_time_var2;
-    int s_truck_1,	s_truck_2;
+    //int s_truck_1,	s_truck_2;
 
+    int s_trucks[numtrucks];
     int s_cars[numcars];
 	int s_logs[numlogs];
 
@@ -29,10 +31,11 @@ void loadgame(){
         time_var1 = s_time_var1;
         frog_x = s_frog_x;
         frog_y = s_frog_y;
+        level = s_level;
         lives_remaining = s_lives_remaining;
         time_var2 = s_time_var2;
-        truck_1 = s_truck_1;
-        truck_2 = s_truck_2;
+        trucks[0] = s_trucks[0];
+        trucks[1] = s_trucks[1];
 
         for (i = 0; i <= numcars; i++){
             cars[i] = s_cars[i];
@@ -56,9 +59,9 @@ void savegame(){
     s_frog_y = frog_y;
     s_lives_remaining = lives_remaining;
     s_time_var2 = time_var2;
-
-    s_truck_1 = truck_1;
-    s_truck_2 = truck_2;
+    s_level = level;
+    s_trucks[0] = trucks[0];
+    s_trucks[1] = trucks[1];
 
     for (i = 0; i <= numcars; i++){
     	s_cars[i] = cars[i];
