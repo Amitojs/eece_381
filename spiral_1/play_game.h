@@ -118,6 +118,7 @@ int sd_playgame(){
 
 
 		if ( draw_frogger() ) {
+			backbuffer = pixel_buffer;
 			alt_up_pixel_buffer_dma_swap_buffers(pixel_buffer);
 			return 0;
 		}
@@ -160,6 +161,7 @@ int sd_playgame(){
 				time_var2=0;
 			}
 		}
+		backbuffer = pixel_buffer;
 		while (alt_up_pixel_buffer_dma_swap_buffers(pixel_buffer) != 0){};
 		while (alt_up_pixel_buffer_dma_check_swap_buffers_status(pixel_buffer) != 0){};
 	}
@@ -247,6 +249,7 @@ int playgame(){
 
 		//If the movement function returns a 1, that means user quit the game
 		if ( draw_frogger() ) {
+			backbuffer = pixel_buffer;
 			alt_up_pixel_buffer_dma_swap_buffers(pixel_buffer);
 			return 0;
 		}
@@ -288,7 +291,7 @@ int playgame(){
 				time_var2=0;
 			}
 		}
-
+		backbuffer = pixel_buffer;
 		while (alt_up_pixel_buffer_dma_swap_buffers(pixel_buffer) != 0){};
 		while (alt_up_pixel_buffer_dma_check_swap_buffers_status(pixel_buffer) != 0){};
 

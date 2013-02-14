@@ -218,7 +218,7 @@ void frog_bmp_draw(){
 				colour = colourarr[temp[i*20+j]];
 				if (colour != 0xffff)
 
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x+j, frog_y-i+23, frog_x+j, frog_y-i+23, colour, 1);
+					alt_up_pixel_buffer_dma_draw(backbuffer, colour,  frog_x+j, frog_y-i+23);
 			}
 		}
 	}else if ( last_real_dir == down){
@@ -226,7 +226,7 @@ void frog_bmp_draw(){
 			for ( j=0; j<20; j++){
 				colour = colourarr[temp[i*20+j]];
 				if (colour != 0xffff)
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x+j, frog_y+i, frog_x+j, frog_y+i, colour, 1);
+					alt_up_pixel_buffer_dma_draw(backbuffer, colour, frog_x+j, frog_y+i);
 			}
 		}
 	}else if (last_real_dir == right){
@@ -234,7 +234,7 @@ void frog_bmp_draw(){
 			for ( j=0; j<20; j++){
 				colour = colourarr[temp[i*20+j]];
 				if (colour != 0xffff)
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x+i, frog_y+j+2, frog_x+i, frog_y+j+2, colour, 1);
+					alt_up_pixel_buffer_dma_draw(backbuffer, colour, frog_x+i, frog_y+j+2);
 			}
 		}
 	}else if (last_real_dir == left){
@@ -242,7 +242,7 @@ void frog_bmp_draw(){
 			for ( j=0; j<20; j++){
 				colour = colourarr[temp[i*20+j]];
 				if (colour != 0xffff)
-					alt_up_pixel_buffer_dma_draw_box(pixel_buffer, frog_x-i+19, frog_y+j+2, frog_x-i+19, frog_y+j+2, colour, 1);
+					alt_up_pixel_buffer_dma_draw(backbuffer, colour, frog_x-i+19, frog_y+j+2);
 			}
 		}
 	}
