@@ -8,7 +8,7 @@
 //Directions
 typedef enum { up, down, left, right, nodir, dpause, changedir, dontchangedir } dir;
 //------------------------------------------------------
-typedef enum { NoBlock, Grass, Water, Highway, WinBlock, Highway_t } background;
+typedef enum { NoBlock, Grass, Water, Highway, WinBlock, Highway_t, CoolGrass} background;
 background g[50][50];
 int keyb_set;
 char score[20];
