@@ -5,6 +5,8 @@
 
 int load(void);
 
+
+// Simple visual display of the highscores variable to the user
 int highscores(){
     int i;
     alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 0, 320, 240, 0x0000, 0);
@@ -17,6 +19,8 @@ int highscores(){
     for (i=0; i<10000000; i++);
 return 0;}
 
+
+// Simple visual display to tell the user they have won. After a set time, will return.
 int win(){
     int i;
     alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 0, 320, 240, 0x0000, 0);
@@ -24,6 +28,9 @@ int win(){
     for (i=0; i<10000000; i++);
 return 0;}
 
+
+// Simple visual display to tell the user they have lost. After a set time, will return.
+// Additionally will provide the user the reason they lost : Time or Death
 int die(){
     int i;
     alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 0, 320, 240, 0x0000, 0);
@@ -35,6 +42,10 @@ int die(){
     for (i=0; i<10000000; i++);
 return 0;}
 
+
+// Menuhelper, controlling the placement of the cursor for the menu.
+// Takes the current curson position (0,1,2) and the x-offset for screenplacement.
+// Additionally clears the positions where the cursor could be, but is not.
 void menuhelper(sel, x){
     if (sel%3 == 0){
         alt_up_pixel_buffer_dma_draw_box(pixel_buffer, x, 100, x+10, 110, 0xf000, 0);
@@ -51,10 +62,16 @@ void menuhelper(sel, x){
     }
 }
 
+// Main menu screen. Will wait for user input, then call another function to accomidate.
+// Clears full screen.
+// Will use menuhelper to display the selection cursor
 int menu(){
+	//arbitrary
     unsigned int sel = 999;
+	//cursor offset
     int x = 80;
-
+	
+	// Write the menu to the screens
     alt_up_char_buffer_clear(char_buffer);
     alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 0, 320, 240, 0x0000, 0);
     alt_up_char_buffer_string(char_buffer, "---MENU---", 30, 10);
@@ -64,6 +81,7 @@ int menu(){
 
     menuhelper(sel, x);
 
+	// Cycle until user makes a choice
     for(;;){
         dir mydir = getdir();
         if (mydir == down) menuhelper(++sel, x);
@@ -85,10 +103,16 @@ int menu(){
 return 0;}
 
 
+// Load screen, a subset of the main menu. Canceling will return to the main menu.
+// Clears full screen.
+// Will use menuhelper to display the selection cursor
 int load(){
+	//arbitrary
     unsigned int sel = 999;
+	//cursor offset
     int x = 80;
-
+	
+	// Write the menu to the screen
     alt_up_char_buffer_clear(char_buffer);
     alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 0, 320, 240, 0x0000, 0);
     alt_up_char_buffer_string(char_buffer, "---LOAD GAME---", 30, 10);
@@ -97,7 +121,8 @@ int load(){
     alt_up_char_buffer_string(char_buffer, "Cancel", 30, 51);
 
     menuhelper(sel, x);
-
+	
+	// Cycle until user makes a choice
     for(;;){
         dir mydir = getdir();
         if (mydir == down) menuhelper(++sel, x);
@@ -109,7 +134,6 @@ int load(){
             }else if (sel%3 == 1){
                 alt_up_char_buffer_clear(char_buffer);
                 sd_playgame();
-                //printf("IM HERE");
             }else if (sel%3 == 2){
                 alt_up_char_buffer_clear(char_buffer);
                 //Cancel, just return
@@ -119,9 +143,17 @@ int load(){
     }
 return 0;}
 
+
+// Provides a menu denoting the game has been paused.
+// Does not clear full screen, will only print over one third of the screen, in the middle.
+// Will use menuhelper to display the selection cursor
 int pause(){
+	//arbitrary
     int sel = 999;
+	//cursor offset
     int x = 180;
+	
+	// Write the menu to the screen
     alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(gridx/3), 0, (320/gridx)*(2*gridx/3), 240, 0x0000, 0);
     alt_up_char_buffer_string(char_buffer, "---PAUSE---", 30, 10);
     alt_up_char_buffer_string(char_buffer, "Resume Game", 30, 26);
@@ -129,6 +161,8 @@ int pause(){
     alt_up_char_buffer_string(char_buffer, "Save & Quit", 30, 51);
 
     menuhelper(sel, x);
+	
+	// Cycle until user makes a choice
     for(;;){
         dir mydir = getdir();
         if (mydir == down) menuhelper(++sel, x);
@@ -156,9 +190,17 @@ int pause(){
     return 0;
 }
 
+
+// The win menu, shown on completion of a level.
+// Does not clear full screen, will only print over one third of the screen, in the middle.
+// Will use menuhelper to display the selection cursor
 int win_menu(){
+	//arbitrary
     int sel = 999;
+	//cursor offset
     int x = 180;
+	
+	// Write the menu to the screen
     alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(gridx/3), 0, (320/gridx)*(2*gridx/3), 240, 0x0000, 0);
     alt_up_char_buffer_string(char_buffer, "Continue To Next Level?", 26, 10);
     alt_up_char_buffer_string(char_buffer, "Yes", 30, 26);
@@ -166,6 +208,8 @@ int win_menu(){
     alt_up_char_buffer_string(char_buffer, "Replay Level", 30, 51);
 
     menuhelper(sel, x);
+	
+	// Cycle until user makes a choice
     for(;;){
         dir mydir = getdir();
         if (mydir == down) menuhelper(++sel, x);
