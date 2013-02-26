@@ -34,6 +34,8 @@ alt_up_char_buffer_dev *char_buffer;
 
 //------------------------------------------------------
 
+
+//This function is run at the beggining of the program and initilizes the VGA front, back, and character buffers.
 void initilize_vga(){
     // Use the name of your pixel buffer DMA core
     pixel_buffer = alt_up_pixel_buffer_dma_open_dev(YOUR_PIXEL_BUFFER_NAME);

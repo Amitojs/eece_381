@@ -45,7 +45,8 @@ int last_fy = 0;
 
 
 
-// Reset the entire movement matrix to all zeros
+// Reset the entire movement matrix to all zeros, so that it can be repopulated
+// with updated vehicle positions.
 void init_matrix(){
 	int i, j = 0;
 	for (i=0; i<gridy; i++){
@@ -66,7 +67,7 @@ void init_variables(){
 	lives_remaining = 3;
 	time_var1 = 150;
 	time_var2 =0;
-	
+
 	// Truck startings
 	trucks[0] = (320/gridx)*0;
 	trucks[1] = (320/gridx)*8;
@@ -74,7 +75,7 @@ void init_variables(){
 	trucks[3] = (320/gridx)*15;
 	trucks[4] = (320/gridx)*10;
 	trucks[5] = (320/gridx)*15;
-	
+
 	// Car startings
 	cars[0] = (320/gridx)*1;
 	cars[1] = (320/gridx)*6;
@@ -136,7 +137,7 @@ dir getdir(){
 			lastdir = nodir;
 		return nodir;
 	} else {
-	
+
 	// If there is no attached keyboard, the program will fall back to checking the switches
 	// for a change in input to denote a movement.
 	// last_real_dir is updated to denote the last actual direction, used for the direction frogger faces.
@@ -166,7 +167,10 @@ dir getdir(){
 }
 
 
-// Draw frogger to the VGA screen.
+// Draw frogger to the VGA screen by using the global variables
+// frog_y and frog_x which is the x and y position of fogger.
+// Also changes the value of the global variables frog_y and
+// frog_x;
 int draw_frogger(){
 	int p;
 	dir mydir = getdir();

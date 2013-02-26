@@ -168,6 +168,11 @@ int sd_playgame(){
 
 }
 
+// Function which run's all of the necessary functions in order to play the game.
+// Is called from the Menu Function.
+// Initilizes the vehicles positions at the beggining of a non SD level.
+// Changes the global variables Lives Remaining, Highscore, frog_x, frog_y, time_var1,
+// and time_var2.
 int playgame(){
 
 	//Initialize Variables

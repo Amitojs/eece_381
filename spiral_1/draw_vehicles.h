@@ -22,7 +22,14 @@ int movement_matrix[50][50];
 //------------------------------------------------------
 
 
-
+//A function which draws vehicles.
+//Vehicle types you can choose include: Car, Truck or Log
+//Can chose the starting x and y location of the vehicle as well as it's colour, size, direction, and speed.
+//Function returns the variable x_location incremented by the variable speed, which is the updated horizontal
+//   position of the vehicle.
+//The function also plots the vehicles position on the movement matrix which allows the program to keep track
+//   of a vehicles position.
+//This function changes no gloabl variables other than movement_matrix[][].
 int draw_vehicle(vehicle myvehicle, int x_location, int y_location, int colour, int size, int direction, int speed){
 	int colour_2;
 	int colour_3;

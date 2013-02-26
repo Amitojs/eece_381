@@ -70,7 +70,7 @@ int menu(){
     unsigned int sel = 999;
 	//cursor offset
     int x = 80;
-	
+
 	// Write the menu to the screens
     alt_up_char_buffer_clear(char_buffer);
     alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 0, 320, 240, 0x0000, 0);
@@ -111,7 +111,7 @@ int load(){
     unsigned int sel = 999;
 	//cursor offset
     int x = 80;
-	
+
 	// Write the menu to the screen
     alt_up_char_buffer_clear(char_buffer);
     alt_up_pixel_buffer_dma_draw_box(pixel_buffer, 0, 0, 320, 240, 0x0000, 0);
@@ -121,7 +121,7 @@ int load(){
     alt_up_char_buffer_string(char_buffer, "Cancel", 30, 51);
 
     menuhelper(sel, x);
-	
+
 	// Cycle until user makes a choice
     for(;;){
         dir mydir = getdir();
@@ -152,7 +152,7 @@ int pause(){
     int sel = 999;
 	//cursor offset
     int x = 180;
-	
+
 	// Write the menu to the screen
     alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(gridx/3), 0, (320/gridx)*(2*gridx/3), 240, 0x0000, 0);
     alt_up_char_buffer_string(char_buffer, "---PAUSE---", 30, 10);
@@ -161,7 +161,7 @@ int pause(){
     alt_up_char_buffer_string(char_buffer, "Save & Quit", 30, 51);
 
     menuhelper(sel, x);
-	
+
 	// Cycle until user makes a choice
     for(;;){
         dir mydir = getdir();
@@ -199,7 +199,7 @@ int win_menu(){
     int sel = 999;
 	//cursor offset
     int x = 180;
-	
+
 	// Write the menu to the screen
     alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(gridx/3), 0, (320/gridx)*(2*gridx/3), 240, 0x0000, 0);
     alt_up_char_buffer_string(char_buffer, "Continue To Next Level?", 26, 10);
@@ -208,7 +208,7 @@ int win_menu(){
     alt_up_char_buffer_string(char_buffer, "Replay Level", 30, 51);
 
     menuhelper(sel, x);
-	
+
 	// Cycle until user makes a choice
     for(;;){
         dir mydir = getdir();

@@ -28,7 +28,7 @@ char time_remaining[20];
 char time_r[5];
 
 //----------------------------
-// Helper variables for the 
+// Helper variables for the
 // grass/flower proof of concept
 
 char grass[480];
@@ -41,7 +41,9 @@ int pghf =0;
 //----------------------------
 
 
-
+//A function which draws all of the information at the top of the screen such as Time Remaining, a
+//box which decreases as you run out of time, Lives Remaining, and Score.  Function takes no inputs
+//and changes no variables.
 void draw_topinfo(){
 	if((time_var1 - 90) >= 10){
 		strncpy(time_remaining, "Time Remaining: ", sizeof(time_remaining));
@@ -114,7 +116,7 @@ void printgrid(){
     }
 }
  */
- 
+
 // Print Grid Helper function:
 // Used to load the flower into memory
 // Will only be called once due to pghf flag
@@ -124,7 +126,7 @@ void pgh(){
 		// Get image from SD card
 		bmp_read("flower.bmp", grassptr, palptr);
 		unsigned int blue,green,red;
-		
+
 		// Load colour data into the preset arrays
 		for (i = 0; i<256; i++){
 			blue  = *(palptr + 3*i  + 0);
@@ -142,21 +144,21 @@ void pgh(){
 // Prints the entire level to the screen, grid piece by grid piece.
 void printgrid(){
 	int i,j = 0;
-	
+
 	// Set up colour data
 	pgh();
-	
+
 	// Print the entire grid onto the VGA screen
 	for (i=0; i<gridy; i++){
 		for (j=0; j<gridx; j++){
 			// Print a block with corresponding colour, and/or image.
-			
+
 			if      (g[i][j] == NoBlock)
 				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(j), (240/gridy)*(i), (320/gridx)*(j+1), (240/gridy)*(i+1), c_NoBlock, 1);
-				
+
 			else if (g[i][j] == Grass)
 				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(j), (240/gridy)*(i), (320/gridx)*(j+1), (240/gridy)*(i+1), c_Grass, 1);
-				
+
 			else if (g[i][j] == Water){
 				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(j), (240/gridy)*(i), (320/gridx)*(j+1), (240/gridy)*(i+1), c_Water, 1);
 				movement_matrix[i][j] = 1;
@@ -169,7 +171,7 @@ void printgrid(){
 				for( m=0; m<24; m++){
 					for ( n=0; n<20; n++){
 						col = colour[grass[m*20+n]];
-						
+
 						// Remove white from the BMP to provide transparency
 						if (col != 0xffff)
 							alt_up_pixel_buffer_dma_draw(backbuffer, col,  (320/gridx*j)+n, (240/gridy*i)-m+23);
@@ -178,10 +180,10 @@ void printgrid(){
 			}
 			else if (g[i][j] == Highway)
 				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(j), (240/gridy)*(i), (320/gridx)*(j+1), (240/gridy)*(i+1), c_Highway, 1);
-				
+
 			else if (g[i][j] == WinBlock)
 				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(j), (240/gridy)*(i), (320/gridx)*(j+1), (240/gridy)*(i+1), c_WinBlock, 1);
-				
+
 			else if (g[i][j] == Highway_t){
 				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(j), (240/gridy)*(i), (320/gridx)*(j+1), (240/gridy)*(i+1), c_Highway, 1);
 				alt_up_pixel_buffer_dma_draw_box(pixel_buffer, (320/gridx)*(j), (240/gridy)*(i), (320/gridx)*(j+1), (240/gridy)*(i)+1, c_Yellow, 1);
@@ -194,7 +196,7 @@ void printgrid(){
 // Setup the hardcoded level design
 void setup_level(int level_select){
 	int i;
-	
+
 	// Level one, highways and water
 	if (level_select == 1){
 		for ( i=0; i<gridx; i++ ){
@@ -208,7 +210,7 @@ void setup_level(int level_select){
 			g[5][2] = CoolGrass;
 			g[5][6] = CoolGrass;
 			g[6][i] = Highway;
-			
+
 			// Provide a bit of line colourization to the highway
 			if(i%2){
 				g[7][i] = Highway;
@@ -223,7 +225,7 @@ void setup_level(int level_select){
 			g[9][3] = CoolGrass;
 		}
 	}
-	
+
 	// Level two, all highways
 	if(level_select == 2){
 		for ( i=0; i<gridx; i++ ){
