@@ -17,22 +17,35 @@
 #include "ps2.h"
 
 //------------------------------------------------------
-// Global Variables
+// Movement variables
 dir lastdir;
 dir secondlastdir;
 
-unsigned int* colourptr;
-unsigned int colourarr [256];
 
+//------------------------------------------------------
+// BMP Frogger colour variables
 dir last_real_dir = up;
 char palette[768];
 unsigned char temp[480];
 char* palptr;
 unsigned char* tempptr;
+unsigned int* colourptr;
+unsigned int colourarr [256];
+
+
+//------------------------------------------------------
+// Frog location
 int last_fx = 0;
 int last_fy = 0;
+
+
+
 //------------------------------------------------------
 
+
+
+
+// Reset the entire movement matrix to all zeros
 void init_matrix(){
 	int i, j = 0;
 	for (i=0; i<gridy; i++){
@@ -42,20 +55,27 @@ void init_matrix(){
 	}
 }
 
+
+// Provide a starting position for hard coded level design
+// All are chosen by hand to fill the screen and present a challenging game
 void init_variables(){
+
+	// Initial frogger position, lives, and time
 	frog_x = (320/gridx)*6;
 	frog_y = (240/gridy)*9;
 	lives_remaining = 3;
 	time_var1 = 150;
 	time_var2 =0;
-
+	
+	// Truck startings
 	trucks[0] = (320/gridx)*0;
 	trucks[1] = (320/gridx)*8;
 	trucks[2] = (320/gridx)*4;
 	trucks[3] = (320/gridx)*15;
 	trucks[4] = (320/gridx)*10;
 	trucks[5] = (320/gridx)*15;
-
+	
+	// Car startings
 	cars[0] = (320/gridx)*1;
 	cars[1] = (320/gridx)*6;
 	cars[2] = (320/gridx)*11;
@@ -69,10 +89,10 @@ void init_variables(){
 	cars[10]= (320/gridx)*10;
 	cars[11]= (320/gridx)*8;
 	cars[12]= (320/gridx)*16;
-
 	cars[13]= (320/gridx)*0;
 	cars[14]= (320/gridx)*6;
 
+	// log startings
 	logs[0]	= (320/gridx)*1;
 	logs[1]	= (320/gridx)*5;
 	logs[2]	= (320/gridx)*2.5;
@@ -81,20 +101,27 @@ void init_variables(){
 	logs[5]	= (320/gridx)*10;
 }
 
+
+// Helper function to determing if Frogger is standing on a WinBlock
+// This returns a 1 to tell the caller that the current position is a winblock
 int checkwin(){
-	if (g[frog_y/(240/gridy)][frog_x/(320/gridx)] == WinBlock){
+	if (g[frog_y/(240/gridy)][frog_x/(320/gridx)] == WinBlock)
 		return 1;
-	}
 	else
 		return 0;
 }
 
+// Switch Finder helper function
+// Used to directly address the IO for switches value
+// Only used in case of absent keyboard
 int swfinder(){
 	return IORD_8DIRECT(YOUR_SWITCHES_ADDR, 0);
 }
 
+
+// Get keyboard directions, or alteratively, switch directions
 dir getdir(){
-	if ( (keyb_set) ) { // get direction from keyboard
+	if ( (keyb_set) ) {
 		dir dirFromKeyB;
 		dirFromKeyB = getDirectionFromKeyboard(lastdir, secondlastdir);
 		if ( (dirFromKeyB == dpause) || (dirFromKeyB == up) || (dirFromKeyB == down) || (dirFromKeyB == right) || (dirFromKeyB == left) ) {
@@ -109,8 +136,11 @@ dir getdir(){
 			lastdir = nodir;
 		return nodir;
 	} else {
-
-
+	
+	// If there is no attached keyboard, the program will fall back to checking the switches
+	// for a change in input to denote a movement.
+	// last_real_dir is updated to denote the last actual direction, used for the direction frogger faces.
+	// lastdir contains the nominal direction; may or may not be an actual direction.
 		if       (swfinder() == 0){
 			lastdir = nodir;
 		}else if (swfinder() == 1 && lastdir == nodir){
@@ -135,6 +165,8 @@ dir getdir(){
 	}
 }
 
+
+// Draw frogger to the VGA screen.
 int draw_frogger(){
 	int p;
 	dir mydir = getdir();
@@ -168,7 +200,8 @@ int draw_frogger(){
 
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
+//	Code break : BMP Conversion ahead
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 /*
 unsigned int get_colour(char* palptr, unsigned char tempstuff){
@@ -249,10 +282,14 @@ void frog_bmp_draw(){
 
 }
 
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//	Code break : Last but not least, main runnable function
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 
 int main(){
 
-
+	// Set up all initializations
 	initilize_vga();
 
 	sd_init();
@@ -261,10 +298,10 @@ int main(){
 
 	initialize_ps2();
 
+	// If kicked out of menu, we should reset the variables and give the menu back to the user.
 	for(;;) {
 		level = 1;
 		init_variables();
-
 
 		menu();
 	}
